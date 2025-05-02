@@ -26,8 +26,8 @@ class Board {
         }
 
         [[nodiscard]]
-        uint8_t GetCastleRights() const {
-            return m_CastleRights;
+        bool CanCastle( const CastleRightsFlag flag ) const {
+            return m_CastleRights & flag;
         }
 
         [[nodiscard]]

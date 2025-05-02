@@ -31,3 +31,10 @@ enum MoveFlag : uint16_t {
     ROOK_PROMOTION_CAPTURE = 14 << 6,
     QUEEN_PROMOTION_CAPTURE = 15 << 6,
 };
+
+enum CastleRightsFlag : uint8_t {
+    CASTLE_BLACK_KING = 0b0001,
+    CASTLE_BLACK_QUEEN = 0b0010,
+    CASTLE_WHITE_KING = 0b0100,
+    CASTLE_WHITE_QUEEN = 0b1000,
+};
