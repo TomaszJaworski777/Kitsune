@@ -1,9 +1,11 @@
-#include <cstdio>
+#include <iostream>
 
-#include "KitsuneEngine/grabber.h"
+#include "KitsuneEngine/core/bitboard.h"
 
 int main() {
-    auto const g = new grabber();
-    printf(g->hello().c_str());
+    std::cout << "Square: (" << Square(E4).ToString() << ")" << std::endl;
+
+    std::cout << Bitboard(Square(E4)).ToString() << std::endl;
+
     return 0;
 }

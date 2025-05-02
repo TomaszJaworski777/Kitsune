@@ -1,5 +1,6 @@
 add_library(Kitsune-Engine STATIC
-        src/grabber.cpp
+        src/core/board.cpp
+        src/core/bitboard.cpp
 )
 
 target_include_directories(Kitsune-Engine
