@@ -80,15 +80,10 @@ struct Bitboard {
             return std::countr_zero( m_Value );
         }
 
-        [[nodiscard]]
-        bool IsEmpty() const {
-            return m_Value == 0;
-        }
-
         template<BitboardIteratorCallback Function>
         void Map( const Function& func ) const {
             auto bitboard = Bitboard( m_Value );
-            while ( !bitboard.IsEmpty() ) {
+            while ( bitboard ) {
                 func( bitboard.PopLs1bBit() );
             }
         }
@@ -111,6 +106,14 @@ struct Bitboard {
 
         Bitboard operator|(const Bitboard value) const {
             return Bitboard{ m_Value | value.m_Value };
+        }
+
+        Bitboard operator&(const uint64_t value) const {
+            return Bitboard{ m_Value & value };
+        }
+
+        Bitboard operator|(const uint64_t value) const {
+            return Bitboard{ m_Value | value };
         }
 
         bool operator==(const Bitboard value) const {
