@@ -1,13 +1,14 @@
 #pragma once
 
 #include "bitboard.h"
+#include "../../../src/core/zobrist_hash.h"
 #include "../types.h"
 
 class Board {
     private:
         Bitboard m_Occupancy[2];
         Bitboard m_Pieces[6];
-        uint64_t m_Hash = 0;
+        ZobristHash m_Hash;
         SideToMove m_Side = WHITE;
         uint8_t m_CastleRights = 0;
         Square m_enPassantSquare = 0;
@@ -85,11 +86,13 @@ class Board {
         void SetPieceOnSquare( const Square square, const PieceType piece, const SideToMove pieceColor ) {
             m_Occupancy[pieceColor].SetBit(square);
             m_Pieces[piece].SetBit(square);
+            m_Hash.UpdatePieceHash( piece, pieceColor, square );
         }
 
         void RemovePieceOnSquare( const Square square, const PieceType piece, const SideToMove pieceColor ) {
             m_Occupancy[pieceColor].PopBit(square);
             m_Pieces[piece].PopBit(square);
+            m_Hash.UpdatePieceHash( piece, pieceColor, square );
         }
 
         [[nodiscard]]
