@@ -38,7 +38,7 @@ struct Bitboard {
         static constexpr uint64_t FULL = 0xFFFFFFFFFFFFFFFF;
         static constexpr uint64_t EMPTY = 0;
 
-        Bitboard( const uint64_t value ) {
+        Bitboard( const uint64_t value = 0 ) {
             m_Value = value;
         }
 

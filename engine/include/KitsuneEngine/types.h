@@ -14,3 +14,20 @@ enum PieceType : uint8_t {
     KING = 5,
     NULL_PIECE = 6,
 };
+
+enum MoveFlag : uint16_t {
+    QUIET_MOVE = 0 << 6,
+    DOUBLE_PUSH = 1 << 6,
+    KING_SIDE_CASTLE = 2 << 6,
+    QUEEN_SIDE_CASTLE = 3 << 6,
+    CAPTURE = 4 << 6,
+    EN_PASSANT = 5 << 6,
+    KNIGHT_PROMOTION = 8 << 6,
+    BISHOP_PROMOTION = 9 << 6,
+    ROOK_PROMOTION = 10 << 6,
+    QUEEN_PROMOTION = 11 << 6,
+    KNIGHT_PROMOTION_CAPTURE = 12 << 6,
+    BISHOP_PROMOTION_CAPTURE = 13 << 6,
+    ROOK_PROMOTION_CAPTURE = 14 << 6,
+    QUEEN_PROMOTION_CAPTURE = 15 << 6,
+};

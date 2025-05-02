@@ -17,9 +17,9 @@ enum SquareIndex : uint8_t {
 
 struct Square {
 	private:
-		uint8_t m_Value = 0;
+		uint8_t m_Value;
 	public:
-		Square( const uint8_t value ) {
+		Square( const uint8_t value = 0 ) {
 			m_Value = value;
 		}
 

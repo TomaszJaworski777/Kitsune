@@ -7,7 +7,6 @@ class Board {
     private:
         Bitboard m_Occupancy[2];
         Bitboard m_Pieces[6];
-
     public:
         [[nodiscard]]
         Bitboard GetOccupancy( const SideToMove stm ) const {
