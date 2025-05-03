@@ -38,3 +38,5 @@ enum CastleRightsFlag : uint8_t {
     CASTLE_WHITE_KING = 0b0100,
     CASTLE_WHITE_QUEEN = 0b1000,
 };
+
+constexpr uint8_t PHASE_VALUES[6]{ 0, 1, 1, 2, 4, 0 };

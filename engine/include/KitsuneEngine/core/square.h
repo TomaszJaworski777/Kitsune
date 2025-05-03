@@ -19,6 +19,7 @@ enum SquareIndex : uint8_t {
 struct Square {
 	private:
 		uint8_t m_Value;
+
 	public:
 		Square( const uint8_t value = NULL_SQUARE ) {
 			m_Value = value;
@@ -28,9 +29,9 @@ struct Square {
 			m_Value = rank * 8 + file;
 		}
 
-		Square( const std::string_view& value ) {
+		Square( const std::string_view &value ) {
 			const uint8_t file = std::ranges::clamp( value[0] - 'a', 0, 7 );
-			const uint8_t rank = std::ranges::clamp( value[1] - '0' - 1, 0 ,7 );
+			const uint8_t rank = std::ranges::clamp( value[1] - '0' - 1, 0, 7 );
 			m_Value = rank * 8 + file;
 		}
 
@@ -52,7 +53,7 @@ struct Square {
 		[[nodiscard]]
 		std::string ToString() const {
 			std::string result;
-			result += static_cast<char>('a' + GetFile() );
+			result += static_cast<char>('a' + GetFile());
 			result += static_cast<char>('0' + GetRank() + 1);
 			return result;
 		}
@@ -61,12 +62,12 @@ struct Square {
 			return m_Value;
 		}
 
-		Square& operator=(const uint8_t value) {
+		Square &operator=( const uint8_t value ) {
 			m_Value = value;
 			return *this;
 		}
 
-		bool operator==(const Square value) const {
+		bool operator==( const Square value ) const {
 			return m_Value == value.m_Value;
 		}
 };

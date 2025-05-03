@@ -6,13 +6,15 @@
 #include "square.h"
 
 template<typename Function>
-concept BitboardIteratorCallback = requires(Function&& func, Square sq) {
-    { func(sq) } -> std::same_as<void>;
+concept BitboardIteratorCallback = requires( Function &&func, Square sq )
+{
+    { func( sq ) } -> std::same_as<void>;
 };
 
 struct Bitboard {
     private:
         uint64_t m_Value = 0;
+
     public:
         static constexpr uint64_t RANK_1 = 0x00000000000000FF;
         static constexpr uint64_t RANK_2 = 0x000000000000FF00;
@@ -47,11 +49,11 @@ struct Bitboard {
         }
 
         void SetBit( const Square square ) {
-            m_Value |= Bitboard(square);
+            m_Value |= Bitboard( square );
         }
 
         void PopBit( const Square square ) {
-            m_Value &= ~Bitboard(square);
+            m_Value &= ~Bitboard( square );
         }
 
         void SwapBytes() {
@@ -60,7 +62,7 @@ struct Bitboard {
 
         [[nodiscard]]
         bool GetBit( const Square square ) const {
-            return ( m_Value & Bitboard(square) ) != 0;
+            return ( m_Value & Bitboard( square ) ) != 0;
         }
 
         [[nodiscard]]
@@ -81,7 +83,7 @@ struct Bitboard {
         }
 
         template<BitboardIteratorCallback Function>
-        void Map( const Function& func ) const {
+        void Map( const Function &func ) const {
             auto bitboard = Bitboard( m_Value );
             while ( bitboard ) {
                 func( bitboard.PopLs1bBit() );
@@ -95,28 +97,28 @@ struct Bitboard {
             return m_Value;
         }
 
-        Bitboard& operator=(const uint64_t value) {
+        Bitboard &operator=( const uint64_t value ) {
             m_Value = value;
             return *this;
         }
 
-        Bitboard operator&(const Bitboard value) const {
+        Bitboard operator&( const Bitboard value ) const {
             return Bitboard{ m_Value & value.m_Value };
         }
 
-        Bitboard operator|(const Bitboard value) const {
+        Bitboard operator|( const Bitboard value ) const {
             return Bitboard{ m_Value | value.m_Value };
         }
 
-        Bitboard operator&(const uint64_t value) const {
+        Bitboard operator&( const uint64_t value ) const {
             return Bitboard{ m_Value & value };
         }
 
-        Bitboard operator|(const uint64_t value) const {
+        Bitboard operator|( const uint64_t value ) const {
             return Bitboard{ m_Value | value };
         }
 
-        bool operator==(const Bitboard value) const {
+        bool operator==( const Bitboard value ) const {
             return m_Value == value.m_Value;
         }
 };
