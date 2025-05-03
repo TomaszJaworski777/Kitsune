@@ -1,5 +1,13 @@
 #include "KitsuneEngine/core/board.h"
 
+Board::Board() {
+
+}
+
+Board::Board(const FEN& fen) {
+
+}
+
 bool Board::IsInsufficientMaterial() const {
 	const Bitboard bishops = GetPieceMask( BISHOP );
 	return m_Phase <= 2 && !GetPieceMask( PAWN ) && ( m_Phase != 2 || (

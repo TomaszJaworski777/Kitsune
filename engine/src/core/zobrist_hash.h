@@ -165,7 +165,7 @@ static constexpr uint64_t SEEDS[793]{
 
 struct ZobristHash {
     private:
-        uint32_t m_Value = 0;
+        uint64_t m_Value = 0;
     public:
         void UpdatePieceHash(const PieceType pieceType, const SideToMove pieceColor, const Square square ) {
             m_Value ^= SEEDS[(pieceType + pieceColor * 6) * 64 + square];

@@ -3,6 +3,7 @@ add_library(Kitsune-Engine STATIC
         src/core/board.cpp
         src/core/bitboard.cpp
         src/core/move.cpp
+        src/core/fen.cpp
 )
 
 target_include_directories(Kitsune-Engine

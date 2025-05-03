@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bitboard.h"
+#include "fen.h"
 #include "../../../src/core/zobrist_hash.h"
 #include "../types.h"
 
@@ -9,12 +10,16 @@ class Board {
         Bitboard m_Occupancy[2];
         Bitboard m_Pieces[6];
         ZobristHash m_Hash;
-        SideToMove m_Side = WHITE;
-        uint8_t m_CastleRights = 0;
-        Square m_enPassantSquare = 0;
-        uint8_t m_HalfMoves = 0;
-        uint8_t m_Phase = 0;
+        SideToMove m_Side;
+        uint8_t m_CastleRights;
+        Square m_enPassantSquare;
+        uint8_t m_HalfMoves;
+        uint8_t m_Phase;
     public:
+        Board();
+
+        Board( const FEN& fen );
+
         [[nodiscard]]
         uint64_t GetHash() const {
             return m_Hash;
