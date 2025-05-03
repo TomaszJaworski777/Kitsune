@@ -52,6 +52,10 @@ struct Square {
 
 		[[nodiscard]]
 		std::string ToString() const {
+			if ( m_Value == NULL_SQUARE ) {
+				return "-";
+			}
+
 			std::string result;
 			result += static_cast<char>('a' + GetFile());
 			result += static_cast<char>('0' + GetRank() + 1);

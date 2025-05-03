@@ -2,8 +2,8 @@
 
 #include "bitboard.h"
 #include "fen.h"
-#include "../../../src/core/zobrist_hash.h"
 #include "../types.h"
+#include "../../../src/core/zobrist_hash.h"
 
 class Board {
 	private:

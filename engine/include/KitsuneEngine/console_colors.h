@@ -30,9 +30,11 @@ struct Color {
 		}
 };
 
-std::string ColorText( const std::string_view& str, const Color& color );
+std::string ColorText( const std::string &str, const Color& color );
 
 constexpr auto RED = Color( 255, 75, 75 );
 constexpr auto GREEN = Color( 75, 255, 75 );
-constexpr auto BLUE = Color( 75, 75, 255 );
+constexpr auto BLUE = Color( 100, 100, 255 );
+constexpr auto DARK_BLUE = Color( 75, 75, 200 );
+constexpr auto YELLOW = Color( 255, 255, 100 );
 
