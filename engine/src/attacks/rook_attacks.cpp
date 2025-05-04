@@ -1,2 +1,112 @@
+#include <iostream>
+
 #include "KitsuneEngine/attacks/attacks.h"
 
+#if PEXT
+#include <immintrin.h>
+#include "attack_arrays/rook_attacks_pext.h"
+#else
+#include "attack_arrays/rook_attacks.h"
+#endif
+
+extern const uint64_t ATTACKS[4092 * 64];
+
+#if !PEXT
+static uint8_t ROOK_OCCUPANCY_COUNT[64]{
+	0xc, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xc, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xb, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa,
+	0xb, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xb, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xb, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa,
+	0xa, 0xb, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xb, 0xc, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xc,
+};
+static uint64_t ROOK_MAGICS[64]{
+	0x8080002080104001, 0x340004120001000, 0x80200010008008, 0x2100100008210004, 0xf00048210480100, 0x100040002010008,
+	0x280008001000200, 0x100010000834422, 0x4900800030804000, 0x1320402010004000, 0xc000808010002000, 0x141001000082100,
+	0x1008800400080080, 0x818800400808200, 0x2000802000184, 0x820800080004100, 0x108000c000e00040, 0x90104000200040,
+	0x202410012200505, 0x801120009220041, 0x4008004040040200, 0x4008004020080, 0x200010100040200, 0x4020010810844,
+	0x4420208080004005, 0x5000400c80200080, 0x200080100080, 0x250100100210008, 0x40280080080, 0x8488020080800400,
+	0x400d0400180270, 0x406000142a1, 0xd080004000c02000, 0x200402000401004, 0x8800600282803000, 0x4008801000800801,
+	0x808080080800400, 0x2810200800400, 0x1801002421000200, 0x800008042000411, 0x8400400080008024, 0x8080500020084000,
+	0x220010010410024, 0x10000804004040, 0x201000801910004, 0x20004008080, 0x2140015002040008, 0x1000040810002,
+	0x400290084460200, 0xc250022000400940, 0x1600104020860600, 0x5000801000080280, 0x51000408021100, 0x800200040080,
+	0x121000200040100, 0x4840c0181304200, 0x201100408202, 0x38850410204001, 0x7014221201800842, 0x210742019009001,
+	0x409600600418306a, 0x1000802040001, 0x240014208102084, 0x1410108100204402,
+};
+#endif
+
+static uint64_t ROOK_MASKS[64]{
+	0x101010101017e, 0x202020202027c, 0x404040404047a, 0x8080808080876, 0x1010101010106e, 0x2020202020205e,
+	0x4040404040403e, 0x8080808080807e, 0x1010101017e00, 0x2020202027c00, 0x4040404047a00, 0x8080808087600,
+	0x10101010106e00, 0x20202020205e00, 0x40404040403e00, 0x80808080807e00, 0x10101017e0100, 0x20202027c0200,
+	0x40404047a0400, 0x8080808760800, 0x101010106e1000, 0x202020205e2000, 0x404040403e4000, 0x808080807e8000,
+	0x101017e010100, 0x202027c020200, 0x404047a040400, 0x8080876080800, 0x1010106e101000, 0x2020205e202000,
+	0x4040403e404000, 0x8080807e808000, 0x1017e01010100, 0x2027c02020200, 0x4047a04040400, 0x8087608080800,
+	0x10106e10101000, 0x20205e20202000, 0x40403e40404000, 0x80807e80808000, 0x17e0101010100, 0x27c0202020200,
+	0x47a0404040400, 0x8760808080800, 0x106e1010101000, 0x205e2020202000, 0x403e4040404000, 0x807e8080808000,
+	0x7e010101010100, 0x7c020202020200, 0x7a040404040400, 0x76080808080800, 0x6e101010101000, 0x5e202020202000,
+	0x3e404040404000, 0x7e808080808000, 0x7e01010101010100, 0x7c02020202020200, 0x7a04040404040400, 0x7608080808080800,
+	0x6e10101010101000, 0x5e20202020202000, 0x3e40404040404000, 0x7e80808080808000,
+};
+
+void GenerateRookMasks();
+
+void GenerateRookOccupancyCount();
+
+Bitboard Attacks::GetRookAttacks( const Square square, const Bitboard occupancy ) {
+	const auto mask = ROOK_MASKS[square];
+#if !PEXT
+	const auto magic = ROOK_MAGICS[square];
+	const auto shift = 64 - ROOK_OCCUPANCY_COUNT[square];
+	const uint64_t index = ( ( occupancy & mask ) * magic ) >> shift;
+#else
+	const uint64_t index = _pext_u64(occupancy, mask);
+#endif
+
+	return ATTACKS[square * 4092 + index];
+}
+
+Bitboard MaskRookAttacks( Square square );
+
+void GenerateRookMasks() {
+	for ( int squareIndex = 0; squareIndex < 64; squareIndex++ ) {
+		ROOK_MASKS[squareIndex] = MaskRookAttacks( Square( squareIndex ) );
+	}
+}
+
+void GenerateRookOccupancyCount() {
+	for ( int squareIndex = 0; squareIndex < 64; squareIndex++ ) {
+		ROOK_OCCUPANCY_COUNT[squareIndex] = MaskRookAttacks( Square( squareIndex ) ).PopCount();
+	}
+}
+
+Bitboard MaskRookAttacks( const Square square ) {
+	auto result = Bitboard::EMPTY;
+
+	int8_t rank = square.GetRank() + 1;
+	int8_t file = square.GetFile();
+	while ( rank < 7 ) {
+		result |= Bitboard( Square( rank, file ) );
+		rank++;
+	}
+
+	rank = square.GetRank() - 1;
+	file = square.GetFile();
+	while ( rank > 0 ) {
+		result |= Bitboard( Square( rank, file ) );
+		rank--;
+	}
+
+	rank = square.GetRank();
+	file = square.GetFile() + 1;
+	while ( file < 7 ) {
+		result |= Bitboard( Square( rank, file ) );
+		file++;
+	}
+
+	rank = square.GetRank();
+	file = square.GetFile() - 1;
+	while ( file > 0 ) {
+		result |= Bitboard( Square( rank, file ) );
+		file--;
+	}
+
+	return result;
+}

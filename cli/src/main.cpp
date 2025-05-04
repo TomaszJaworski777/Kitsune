@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "KitsuneEngine/attacks/attacks.h"
 #include "KitsuneEngine/core/bitboard.h"
 #include "KitsuneEngine/core/board.h"
 #include "KitsuneEngine/core/move.h"

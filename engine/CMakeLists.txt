@@ -4,6 +4,7 @@ add_library(Kitsune-Engine STATIC
         src/core/bitboard.cpp
         src/core/move.cpp
         src/core/fen.cpp
+        src/core/zobrist_hash.cpp
         src/attacks/rays.cpp
         src/attacks/attacks.cpp
         src/attacks/bishop_attacks.cpp

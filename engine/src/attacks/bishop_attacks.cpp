@@ -1,2 +1,113 @@
 #include "KitsuneEngine/attacks/attacks.h"
 
+#if PEXT
+#include <immintrin.h>
+#include "attack_arrays/bishop_attacks_pext.h"
+#else
+#include "attack_arrays/bishop_attacks.h"
+#endif
+
+extern const uint64_t ATTACKS[512 * 64];
+
+#if !PEXT
+static uint8_t BISHOP_OCCUPANCY_COUNT[64]{
+	0x6, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x6, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x7, 0x7, 0x7, 0x7, 0x5,
+	0x5, 0x5, 0x5, 0x7, 0x9, 0x9, 0x7, 0x5, 0x5, 0x5, 0x5, 0x7, 0x9, 0x9, 0x7, 0x5, 0x5, 0x5, 0x5, 0x7, 0x7, 0x7, 0x7,
+	0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x6, 0x5, 0x5, 0x5, 0x5, 0x5, 0x5, 0x6,
+};
+static uint64_t BISHOP_MAGICS[64]{
+	0x8110909001022020, 0x4908c01082100, 0x840c102000000, 0xe004040090826025, 0x901910c000000112, 0x2080404000000,
+	0x86080c24240400, 0x1500140202022102, 0x90100408080069, 0xc20020401240102, 0x80084089020c00, 0x1882a02200810,
+	0x1008221210200200, 0xa020410120101600, 0x4000208808480601, 0x17006008c011920, 0x4001010424800, 0x202020508020c00,
+	0x28008102040211, 0x24002844000801, 0x106045400a20004, 0x202010041100100, 0x20b9001400880491, 0x592005244440400,
+	0x30100040050141, 0x4070040050410200, 0x800c300408008420, 0x1214004004010282, 0x1221010000104000, 0x8020000410084,
+	0x8002008080441010, 0x4001090000404800, 0x4200400085000, 0x14010800049000, 0x225280808040220, 0x4882010040840040,
+	0x290821004020080, 0x8081001a0108, 0x4022244400004200, 0x80c404488000c428, 0x311442a0004100, 0xa82080108008404,
+	0x2410804040408800, 0x2088004200800800, 0x500022a0a002400, 0xc308020408088410, 0x8010024200400420, 0x122092108a1a00,
+	0x48a2080404840c20, 0x4115040104020000, 0x420820141080b, 0x8008084040800, 0x22020510818, 0x1084210410008005,
+	0x408100408304489, 0x2121011200810000, 0x1124220100884045, 0x41000202060a0321, 0x4000020104c800, 0x63010b0411085,
+	0x202408008210101, 0x800004050020888, 0x442418184501, 0x4041020089010a,
+};
+#endif
+
+static uint64_t BISHOP_MASKS[64]{
+	0x40201008040200, 0x402010080400, 0x4020100a00, 0x40221400, 0x2442800, 0x204085000, 0x20408102000, 0x2040810204000,
+	0x20100804020000, 0x40201008040000, 0x4020100a0000, 0x4022140000, 0x244280000, 0x20408500000, 0x2040810200000,
+	0x4081020400000, 0x10080402000200, 0x20100804000400, 0x4020100a000a00, 0x402214001400, 0x24428002800,
+	0x2040850005000, 0x4081020002000, 0x8102040004000, 0x8040200020400, 0x10080400040800, 0x20100a000a1000,
+	0x40221400142200, 0x2442800284400, 0x4085000500800, 0x8102000201000, 0x10204000402000, 0x4020002040800,
+	0x8040004081000, 0x100a000a102000, 0x22140014224000, 0x44280028440200, 0x8500050080400, 0x10200020100800,
+	0x20400040201000, 0x2000204081000, 0x4000408102000, 0xa000a10204000, 0x14001422400000, 0x28002844020000,
+	0x50005008040200, 0x20002010080400, 0x40004020100800, 0x20408102000, 0x40810204000, 0xa1020400000, 0x142240000000,
+	0x284402000000, 0x500804020000, 0x201008040200, 0x402010080400, 0x2040810204000, 0x4081020400000, 0xa102040000000,
+	0x14224000000000, 0x28440200000000, 0x50080402000000, 0x20100804020000, 0x40201008040200,
+};
+
+void GenerateBishopMasks();
+
+void GenerateBishopOccupancyCount();
+
+Bitboard Attacks::GetBishopAttacks( const Square square, const Bitboard occupancy ) {
+	const auto mask = BISHOP_MASKS[square];
+#if !PEXT
+	const auto magic = BISHOP_MAGICS[square];
+	const auto shift = 64 - BISHOP_OCCUPANCY_COUNT[square];
+	const uint64_t index = ( ( occupancy & mask ) * magic ) >> shift;
+#else
+	const uint64_t index = _pext_u64(occupancy, mask);
+#endif
+
+	return ATTACKS[square * 512 + index];
+}
+
+Bitboard MaskBishopAttacks( Square square );
+
+void GenerateBishopMasks() {
+	for ( int squareIndex = 0; squareIndex < 64; squareIndex++ ) {
+		BISHOP_MASKS[squareIndex] = MaskBishopAttacks( Square( squareIndex ) );
+	}
+}
+
+void GenerateBishopOccupancyCount() {
+	for ( int squareIndex = 0; squareIndex < 64; squareIndex++ ) {
+		BISHOP_OCCUPANCY_COUNT[squareIndex] = MaskBishopAttacks( Square( squareIndex ) ).PopCount();
+	}
+}
+
+Bitboard MaskBishopAttacks( const Square square ) {
+	auto result = Bitboard::EMPTY;
+
+	int8_t rank = square.GetRank() + 1;
+	int8_t file = square.GetFile() + 1;
+	while ( rank < 7 && file < 7 ) {
+		result |= Bitboard( Square( rank, file ) );
+		rank++;
+		file++;
+	}
+
+	rank = square.GetRank() - 1;
+	file = square.GetFile() + 1;
+	while ( rank > 0 && file < 7 ) {
+		result |= Bitboard( Square( rank, file ) );
+		rank--;
+		file++;
+	}
+
+	rank = square.GetRank() - 1;
+	file = square.GetFile() - 1;
+	while ( rank > 0 && file > 0 ) {
+		result |= Bitboard( Square( rank, file ) );
+		rank--;
+		file--;
+	}
+
+	rank = square.GetRank() + 1;
+	file = square.GetFile() - 1;
+	while ( rank < 7 && file > 0 ) {
+		result |= Bitboard( Square( rank, file ) );
+		rank++;
+		file--;
+	}
+
+	return result;
+}
