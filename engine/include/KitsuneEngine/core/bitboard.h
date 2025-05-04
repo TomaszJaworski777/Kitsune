@@ -78,6 +78,16 @@ struct Bitboard {
         }
 
         [[nodiscard]]
+        bool OnlyOneBit() const {
+            return m_Value != 0 && !(m_Value & (m_Value - 1));
+        }
+
+        [[nodiscard]]
+        bool MultipleOneBits() const {
+            return m_Value != 0 && (m_Value & (m_Value - 1));
+        }
+
+        [[nodiscard]]
         Square Ls1bSquare() const {
             return std::countr_zero( m_Value );
         }

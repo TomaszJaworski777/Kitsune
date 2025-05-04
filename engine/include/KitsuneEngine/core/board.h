@@ -2,13 +2,15 @@
 
 #include "bitboard.h"
 #include "fen.h"
-#include "../types.h"
 #include "zobrist_hash.h"
+#include "../types.h"
+#include "KitsuneEngine/attacks/pin_mask.h"
 
 class Board {
 	private:
 		Bitboard m_Occupancy[2];
 		Bitboard m_Pieces[6];
+		PinMask m_PinMask;
 		ZobristHash m_Hash;
 		SideToMove m_Side;
 		uint8_t m_CastleRights;
@@ -20,6 +22,11 @@ class Board {
 		Board();
 
 		Board( const FEN &fen );
+
+		[[nodiscard]]
+		PinMask GetPinMask() const {
+			return m_PinMask;
+		}
 
 		[[nodiscard]]
 		uint64_t GetHash() const {
@@ -66,6 +73,11 @@ class Board {
 		}
 
 		[[nodiscard]]
+		Bitboard GetOccupancy() const {
+			return m_Occupancy[0] | m_Occupancy[1];
+		}
+
+		[[nodiscard]]
 		Bitboard GetPieceMask( const PieceType piece ) const {
 			return m_Pieces[piece];
 		}
@@ -74,6 +86,12 @@ class Board {
 		Bitboard GetPieceMask( const PieceType piece, const SideToMove stm ) const {
 			return m_Occupancy[stm] & m_Pieces[piece];
 		}
+
+		[[nodiscard]]
+		Square GetKingSquare( const SideToMove stm ) const {
+			return GetPieceMask( KING, stm ).Ls1bSquare();
+		}
+
 
 		[[nodiscard]]
 		Square GetStmKingSquare() const {

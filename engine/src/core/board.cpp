@@ -1,8 +1,8 @@
 #include "KitsuneEngine/core/board.h"
 
-#include <format>
-
 #include "KitsuneEngine/console_colors.h"
+
+#include <format>
 
 Board::Board() {
 	m_Occupancy[WHITE] = Bitboard::RANK_1 | Bitboard::RANK_2;
@@ -27,6 +27,8 @@ Board::Board() {
 	m_Phase = 24;
 
 	m_Hash = 0x325bf1eb13d84627;
+
+	m_PinMask = PinMask( *this );
 }
 
 Board::Board( const FEN &fen ) {
@@ -89,7 +91,7 @@ Board::Board( const FEN &fen ) {
 
 	m_HalfMoves = std::stoi( fen.GetHalfMoveCounter() );
 
-	//TODO: generate pin and checker masks
+	m_PinMask = PinMask( *this );
 }
 
 bool Board::IsInsufficientMaterial() const {
