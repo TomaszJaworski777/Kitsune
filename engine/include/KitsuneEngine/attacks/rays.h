@@ -5,4 +5,7 @@ struct Rays {
 	public:
 		[[nodiscard]]
 		static Bitboard GetRay( Square from, Square to );
+
+		[[nodiscard]]
+		static Bitboard GetRayWithoutDestination( Square from, Square to );
 };

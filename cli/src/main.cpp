@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "KitsuneEngine/attacks/rays.h"
 #include "KitsuneEngine/core/bitboard.h"
 #include "KitsuneEngine/core/board.h"
 #include "KitsuneEngine/core/move.h"
@@ -18,12 +17,6 @@ int main() {
 
     const auto board = Board(FEN());
     std::cout << board.ToString() << std::endl;
-
-    std::cout << Rays::GetRay(Square(A1), Square(A2)).ToString() << std::endl;
-    std::cout << Rays::GetRay(Square(A1), Square(G7)).ToString() << std::endl;
-    std::cout << Rays::GetRay(Square(E4), Square(E8)).ToString() << std::endl;
-    std::cout << Rays::GetRay(Square(H1), Square(A8)).ToString() << std::endl;
-    std::cout << Rays::GetRay(Square(C1), Square(G8)).ToString() << std::endl;
 
     return 0;
 }

@@ -3,7 +3,7 @@
 #include "bitboard.h"
 #include "fen.h"
 #include "../types.h"
-#include "../../../src/core/zobrist_hash.h"
+#include "zobrist_hash.h"
 
 class Board {
 	private:
