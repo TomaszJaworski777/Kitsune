@@ -9,7 +9,7 @@
 #include "attack_arrays/rook_attacks.h"
 #endif
 
-extern const uint64_t ATTACKS[4092 * 64];
+extern const uint64_t ATTACKS[4096 * 64];
 
 #if !PEXT
 static uint8_t ROOK_OCCUPANCY_COUNT[64]{
@@ -46,10 +46,6 @@ static uint64_t ROOK_MASKS[64]{
 	0x6e10101010101000, 0x5e20202020202000, 0x3e40404040404000, 0x7e80808080808000,
 };
 
-void GenerateRookMasks();
-
-void GenerateRookOccupancyCount();
-
 Bitboard Attacks::GetRookAttacks( const Square square, const Bitboard occupancy ) {
 	const auto mask = ROOK_MASKS[square];
 #if !PEXT
@@ -59,54 +55,5 @@ Bitboard Attacks::GetRookAttacks( const Square square, const Bitboard occupancy 
 #else
 	const uint64_t index = _pext_u64(occupancy, mask);
 #endif
-
-	return ATTACKS[square * 4092 + index];
-}
-
-Bitboard MaskRookAttacks( Square square );
-
-void GenerateRookMasks() {
-	for ( int squareIndex = 0; squareIndex < 64; squareIndex++ ) {
-		ROOK_MASKS[squareIndex] = MaskRookAttacks( Square( squareIndex ) );
-	}
-}
-
-void GenerateRookOccupancyCount() {
-	for ( int squareIndex = 0; squareIndex < 64; squareIndex++ ) {
-		ROOK_OCCUPANCY_COUNT[squareIndex] = MaskRookAttacks( Square( squareIndex ) ).PopCount();
-	}
-}
-
-Bitboard MaskRookAttacks( const Square square ) {
-	auto result = Bitboard::EMPTY;
-
-	int8_t rank = square.GetRank() + 1;
-	int8_t file = square.GetFile();
-	while ( rank < 7 ) {
-		result |= Bitboard( Square( rank, file ) );
-		rank++;
-	}
-
-	rank = square.GetRank() - 1;
-	file = square.GetFile();
-	while ( rank > 0 ) {
-		result |= Bitboard( Square( rank, file ) );
-		rank--;
-	}
-
-	rank = square.GetRank();
-	file = square.GetFile() + 1;
-	while ( file < 7 ) {
-		result |= Bitboard( Square( rank, file ) );
-		file++;
-	}
-
-	rank = square.GetRank();
-	file = square.GetFile() - 1;
-	while ( file > 0 ) {
-		result |= Bitboard( Square( rank, file ) );
-		file--;
-	}
-
-	return result;
+	return ATTACKS[square * 4096 + index];
 }

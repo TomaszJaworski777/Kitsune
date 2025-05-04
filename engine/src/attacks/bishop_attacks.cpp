@@ -43,10 +43,6 @@ static uint64_t BISHOP_MASKS[64]{
 	0x14224000000000, 0x28440200000000, 0x50080402000000, 0x20100804020000, 0x40201008040200,
 };
 
-void GenerateBishopMasks();
-
-void GenerateBishopOccupancyCount();
-
 Bitboard Attacks::GetBishopAttacks( const Square square, const Bitboard occupancy ) {
 	const auto mask = BISHOP_MASKS[square];
 #if !PEXT
@@ -56,58 +52,5 @@ Bitboard Attacks::GetBishopAttacks( const Square square, const Bitboard occupanc
 #else
 	const uint64_t index = _pext_u64(occupancy, mask);
 #endif
-
 	return ATTACKS[square * 512 + index];
-}
-
-Bitboard MaskBishopAttacks( Square square );
-
-void GenerateBishopMasks() {
-	for ( int squareIndex = 0; squareIndex < 64; squareIndex++ ) {
-		BISHOP_MASKS[squareIndex] = MaskBishopAttacks( Square( squareIndex ) );
-	}
-}
-
-void GenerateBishopOccupancyCount() {
-	for ( int squareIndex = 0; squareIndex < 64; squareIndex++ ) {
-		BISHOP_OCCUPANCY_COUNT[squareIndex] = MaskBishopAttacks( Square( squareIndex ) ).PopCount();
-	}
-}
-
-Bitboard MaskBishopAttacks( const Square square ) {
-	auto result = Bitboard::EMPTY;
-
-	int8_t rank = square.GetRank() + 1;
-	int8_t file = square.GetFile() + 1;
-	while ( rank < 7 && file < 7 ) {
-		result |= Bitboard( Square( rank, file ) );
-		rank++;
-		file++;
-	}
-
-	rank = square.GetRank() - 1;
-	file = square.GetFile() + 1;
-	while ( rank > 0 && file < 7 ) {
-		result |= Bitboard( Square( rank, file ) );
-		rank--;
-		file++;
-	}
-
-	rank = square.GetRank() - 1;
-	file = square.GetFile() - 1;
-	while ( rank > 0 && file > 0 ) {
-		result |= Bitboard( Square( rank, file ) );
-		rank--;
-		file--;
-	}
-
-	rank = square.GetRank() + 1;
-	file = square.GetFile() - 1;
-	while ( rank < 7 && file > 0 ) {
-		result |= Bitboard( Square( rank, file ) );
-		rank++;
-		file--;
-	}
-
-	return result;
 }

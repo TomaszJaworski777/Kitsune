@@ -20,5 +20,7 @@ int main() {
     const auto board = Board( FEN() );
     std::cout << board.ToString() << std::endl;
 
+    std::cout << Attacks::GetRookAttacks( Square(E4), board.GetOccupancy() ).ToString() << std::endl;
+
     return 0;
 }
