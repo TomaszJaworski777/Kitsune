@@ -2,8 +2,9 @@
 
 #include "KitsuneEngine/types.h"
 #include "KitsuneEngine/core/bitboard.h"
-#include "KitsuneEngine/core/board.h"
 #include "KitsuneEngine/core/square.h"
+
+class Board;
 
 class Attacks {
 	public:
@@ -23,14 +24,10 @@ class Attacks {
 		static Bitboard GetKingAttacks( Square square );
 
 		[[nodiscard]]
-		static bool IsInCheck( const Board &board ) {
-			return IsSquareAttacked( board, board.GetStmKingSquare() );
-		}
+		static bool IsInCheck( const Board &board );
 
 		[[nodiscard]]
-		static bool IsSquareAttacked( const Board &board, const Square square ) {
-			return IsSquareAttackedWithOccupancy( board, square, board.GetOccupancy() );
-		}
+		static bool IsSquareAttacked( const Board &board, Square square );
 
 		[[nodiscard]]
 		static bool IsSquareAttackedWithOccupancy( const Board &board, Square square, Bitboard occupancy );

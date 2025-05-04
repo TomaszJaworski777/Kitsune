@@ -2,6 +2,7 @@
 
 #include "KitsuneEngine/attacks/attacks.h"
 #include "KitsuneEngine/attacks/rays.h"
+#include "KitsuneEngine/core/board.h"
 
 PinMask::PinMask( const Board &board ) {
 	const auto kingSquare = board.GetStmKingSquare();

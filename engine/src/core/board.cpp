@@ -1,6 +1,7 @@
 #include "KitsuneEngine/core/board.h"
 
 #include "KitsuneEngine/console_colors.h"
+#include "KitsuneEngine/core/fen.h"
 
 #include <format>
 

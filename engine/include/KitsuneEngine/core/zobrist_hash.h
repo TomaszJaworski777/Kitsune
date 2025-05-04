@@ -1,6 +1,6 @@
 #pragma once
 
-#include "KitsuneEngine/types.h"
+#include "../types.h"
 
 static constexpr uint64_t SEEDS[793]{
 	0x5369f774410e97e6, 0x55e6f7a01f64755, 0x605875984e198332, 0x5723d5b334e22ede, 0xcd034991461cf7b,

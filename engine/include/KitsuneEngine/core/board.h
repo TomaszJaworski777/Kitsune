@@ -1,10 +1,11 @@
 #pragma once
 
 #include "bitboard.h"
-#include "fen.h"
 #include "zobrist_hash.h"
 #include "../types.h"
-#include "KitsuneEngine/attacks/pin_mask.h"
+#include "../attacks/pin_mask.h"
+
+struct FEN;
 
 class Board {
 	private:
