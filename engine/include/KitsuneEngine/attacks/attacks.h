@@ -27,17 +27,17 @@ class Attacks {
 		static bool IsInCheck( const Board &board );
 
 		[[nodiscard]]
-		static bool IsSquareAttacked( const Board &board, Square square );
+		static bool IsSquareAttacked( const Board &board, Square square, SideToMove defenderSide );
 
 		[[nodiscard]]
-		static bool IsSquareAttackedWithOccupancy( const Board &board, Square square, Bitboard occupancy );
-
-		[[nodiscard]]
-		static Bitboard AllAttackersToSquare( const Board &board, Square square, Bitboard occupancy );
+		static bool IsSquareAttackedWithOccupancy( const Board &board, Square square, SideToMove defenderSide, Bitboard occupancy );
 
 		[[nodiscard]]
 		static Bitboard GenerateCheckersMask( const Board &board );
 
 		[[nodiscard]]
-		static Bitboard GenerateAttackMap( const Board &board );
+		static Bitboard AllAttackersToSquare( const Board &board, Square square, SideToMove defenderSide, Bitboard occupancy );
+
+		[[nodiscard]]
+		static Bitboard GenerateAttackMap( const Board &board, SideToMove defenderSide );
 };

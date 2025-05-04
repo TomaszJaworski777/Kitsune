@@ -29,7 +29,7 @@ Board::Board() {
 
 	m_Hash = 0x325bf1eb13d84627;
 
-	m_PinMask = PinMask( *this );
+	m_PinMask = PinMask( *this, m_Side );
 }
 
 Board::Board( const FEN &fen ) {
@@ -92,7 +92,7 @@ Board::Board( const FEN &fen ) {
 
 	m_HalfMoves = std::stoi( fen.GetHalfMoveCounter() );
 
-	m_PinMask = PinMask( *this );
+	m_PinMask = PinMask( *this, m_Side );
 }
 
 bool Board::IsInsufficientMaterial() const {

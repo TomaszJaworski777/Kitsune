@@ -3,8 +3,8 @@
 #include "KitsuneEngine/attacks/attacks.h"
 #include "KitsuneEngine/core/bitboard.h"
 #include "KitsuneEngine/core/board.h"
-#include "KitsuneEngine/core/move.h"
 #include "KitsuneEngine/core/fen.h"
+#include "KitsuneEngine/core/move.h"
 
 int main() {
     std::cout << "Square: (" << Square( E4 ).ToString() << ")" << std::endl;
@@ -20,7 +20,7 @@ int main() {
     const auto board = Board( FEN() );
     std::cout << board.ToString() << std::endl;
 
-    std::cout << Attacks::GetRookAttacks( Square(E4), board.GetOccupancy() ).ToString() << std::endl;
+    std::cout << Attacks::GetRookAttacks( Square(A1), board.GetOccupancy() ).ToString() << std::endl;
 
     return 0;
 }
