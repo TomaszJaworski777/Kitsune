@@ -159,7 +159,7 @@ std::string Board::ToString() const {
 				continue;
 			}
 
-			const std::string pieceIcon = std::format( " {}", PIECE_ICONS[pieceColor][piece] );
+			const auto pieceIcon = std::format( " {}", PIECE_ICONS[pieceColor][piece] );
 			result += ColorText( pieceIcon, pieceColor == WHITE ? YELLOW : BLUE );
 		}
 		result += std::format( " | {}\n", info[7 - rank] );

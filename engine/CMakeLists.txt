@@ -4,6 +4,7 @@ add_library(Kitsune-Engine STATIC
         src/core/bitboard.cpp
         src/core/move.cpp
         src/core/fen.cpp
+        src/attacks/rays.cpp
 )
 
 target_include_directories(Kitsune-Engine

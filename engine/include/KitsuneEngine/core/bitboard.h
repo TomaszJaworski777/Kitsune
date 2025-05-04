@@ -118,6 +118,26 @@ struct Bitboard {
             return Bitboard{ m_Value | value };
         }
 
+        Bitboard& operator&=( const Bitboard value ) {
+            m_Value &= value.m_Value;
+            return *this;
+        }
+
+        Bitboard& operator|=( const Bitboard value ) {
+            m_Value |= value.m_Value;
+            return *this;
+        }
+
+        Bitboard& operator&=( const uint64_t value ) {
+            m_Value &= value;
+            return *this;
+        }
+
+        Bitboard& operator|=( const uint64_t value ) {
+            m_Value |= value;
+            return *this;
+        }
+
         bool operator==( const Bitboard value ) const {
             return m_Value == value.m_Value;
         }
