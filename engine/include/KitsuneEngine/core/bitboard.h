@@ -79,12 +79,12 @@ struct Bitboard {
 
         [[nodiscard]]
         bool OnlyOneBit() const {
-            return m_Value != 0 && !(m_Value & (m_Value - 1));
+            return m_Value != 0 && !( m_Value & ( m_Value - 1 ) );
         }
 
         [[nodiscard]]
         bool MultipleOneBits() const {
-            return m_Value != 0 && (m_Value & (m_Value - 1));
+            return m_Value != 0 && ( m_Value & ( m_Value - 1 ) );
         }
 
         [[nodiscard]]
@@ -128,22 +128,22 @@ struct Bitboard {
             return Bitboard{ m_Value | value };
         }
 
-        Bitboard& operator&=( const Bitboard value ) {
+        Bitboard &operator&=( const Bitboard value ) {
             m_Value &= value.m_Value;
             return *this;
         }
 
-        Bitboard& operator|=( const Bitboard value ) {
+        Bitboard &operator|=( const Bitboard value ) {
             m_Value |= value.m_Value;
             return *this;
         }
 
-        Bitboard& operator&=( const uint64_t value ) {
+        Bitboard &operator&=( const uint64_t value ) {
             m_Value &= value;
             return *this;
         }
 
-        Bitboard& operator|=( const uint64_t value ) {
+        Bitboard &operator|=( const uint64_t value ) {
             m_Value |= value;
             return *this;
         }

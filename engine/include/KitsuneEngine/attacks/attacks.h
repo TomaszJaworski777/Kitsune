@@ -30,13 +30,15 @@ class Attacks {
 		static bool IsSquareAttacked( const Board &board, Square square, SideToMove defenderSide );
 
 		[[nodiscard]]
-		static bool IsSquareAttackedWithOccupancy( const Board &board, Square square, SideToMove defenderSide, Bitboard occupancy );
+		static bool IsSquareAttackedWithOccupancy( const Board &board, Square square, SideToMove defenderSide,
+		                                           Bitboard occupancy );
 
 		[[nodiscard]]
 		static Bitboard GenerateCheckersMask( const Board &board );
 
 		[[nodiscard]]
-		static Bitboard AllAttackersToSquare( const Board &board, Square square, SideToMove defenderSide, Bitboard occupancy );
+		static Bitboard AllAttackersToSquare( const Board &board, Square square, SideToMove defenderSide,
+		                                      Bitboard occupancy );
 
 		[[nodiscard]]
 		static Bitboard GenerateAttackMap( const Board &board, SideToMove defenderSide );
