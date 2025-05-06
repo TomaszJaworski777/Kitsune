@@ -1,10 +1,5 @@
-#include <iomanip>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <__msvc_ostream.hpp>
+#include <catch2/catch_test_macros.hpp>
 
-#include "KitsuneEngine/console_colors.h"
 #include "KitsuneEngine/core/board.h"
 #include "KitsuneEngine/core/fen.h"
 #include "KitsuneEngine/core/perft.h"
@@ -142,18 +137,15 @@ static const std::string TEST_CASES[128]{
 
 static std::vector<std::string> Split( const std::string &str, char delimiter );
 
-int main() {
+TEST_CASE( "Move Generator", "[PerftTests]" ) {
 	for ( uint32_t i = 0; i < 128; i++ ) {
 		const auto testCase = Split( TEST_CASES[i], ';' );
 		const auto fen = FEN( testCase[0] );
 		const auto target = Split( testCase[testCase.size() - 1], ' ' );
 		const auto depth = target[0][1] - '0';
 		const uint64_t expected = std::stoi( target[1] );
-		const auto result = Perft( Board( fen ), depth, true, false, true );
-		std::cout << std::left << std::setw(80) << fen.ToString() << (
-			result == expected ? ColorText( "PASSED", GREEN ) : ColorText( "FAILED", RED ) ) << std::endl;
+		SECTION( testCase[0] ) { CHECK( Perft( Board( fen ), depth, true, false, true ) == expected ); }
 	}
-	return 0;
 }
 
 static std::vector<std::string> Split( const std::string &str, const char delimiter ) {
