@@ -45,9 +45,11 @@ enum CastleRightsFlag : uint8_t {
 	CASTLE_WHITE_QUEEN = 0b1000,
 };
 
-constexpr uint8_t PHASE_VALUES[6]{ 0, 1, 1, 2, 4, 0 };
+static constexpr uint8_t PHASE_VALUES[6]{ 0, 1, 1, 2, 4, 0 };
 
-constexpr uint8_t CASTLE_MASK[64]{
+static constexpr uint8_t CASTLE_MASK[64]{
 	0b1000, 0, 0, 0, 0b1100, 0, 0, 0b0100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0b0010, 0, 0, 0, 0b0011, 0, 0, 0b0001,
 };
+
+constexpr uint8_t MAX_MOVES = 218;

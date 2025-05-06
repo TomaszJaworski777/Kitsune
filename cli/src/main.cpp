@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include <thread>
 
@@ -5,12 +6,10 @@
 #include "KitsuneEngine/core/bitboard.h"
 #include "KitsuneEngine/core/board.h"
 #include "KitsuneEngine/core/fen.h"
-#include "KitsuneEngine/core/move.h"
-#include "KitsuneEngine/core/move_gen.h"
-#include "KitsuneEngine/core/attacks/attacks.h"
+#include "KitsuneEngine/core/perft.h"
 
 int main() {
-	const auto infos = new std::string[27] {};
+	const auto infos = new std::string[27]{ };
 	infos[3] = "Kitsune Chess Engine";
 	infos[5] = "by Tomasz Jaworski";
 	infos[6] = "and Dorian Kernel";
@@ -21,26 +20,30 @@ int main() {
 	infos[14] = "	bench <depth>";
 	infos[15] = "	eval";
 	infos[16] = "	draw";
-	std::cout << "\n" << GetASCIILogo(infos) << std::endl << std::endl;
+	std::cout << "\n" << GetASCIILogo( infos ) << std::endl << std::endl;
 
-	auto board = Board( FEN( "1r5r/P7/3k4/5pP1/8/8/P7/R3K2R w KQ f6 0 1" ) );
+	auto board = Board( FEN() );
 	std::cout << board.ToString() << std::endl;
 
-	Move moves[218] {};
-	uint8_t size = 0;
+	auto thread = std::jthread( [&board]( std::stop_token token ) {
+		auto t = std::chrono::high_resolution_clock::now();
+		uint64_t result = Perft( board, 6, false, true, true );
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::high_resolution_clock::now() - t );
+		std::cout << "Result: " << result << std::endl;
+		std::cout << "Time: " << duration << std::endl;
+		std::cout << "Speed: " << (result * 1000 / duration.count()) << "nps" << std::endl << std::endl << std::endl;
 
-	auto thread = std::jthread( [&moves, &board, &size](std::stop_token token) {
-		const auto moveGenerator = MoveGenerator( board );
-		size = moveGenerator.GenerateNoisyMoves( moves );
-		size += moveGenerator.GenerateQuietMoves( moves + size );
+		t = std::chrono::high_resolution_clock::now();
+		result = Perft( board, 7, true, true, true );
+		duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::high_resolution_clock::now() - t );
+		std::cout << "Result: " << result << std::endl;
+		std::cout << "Time: " << duration << std::endl;
+		std::cout << "Speed: " << (result * 1000 / duration.count()) << "nps" << std::endl << std::endl << std::endl;
 	} );
 
 	thread.join();
-
-	std::cout << "Size: " << static_cast<uint32_t>(size) << std::endl;
-	for (uint8_t i = 0; i < size; i++) {
-		std::cout << moves[i].ToString() << " - 1" << std::endl;
-	}
 
 	return 0;
 }

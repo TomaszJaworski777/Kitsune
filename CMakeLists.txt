@@ -7,3 +7,4 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(engine)
 add_subdirectory(cli)
+add_subdirectory(tests)

@@ -14,6 +14,7 @@ add_library(Kitsune-Engine STATIC
         src/core/attacks/pawn_attacks.cpp
         src/core/attacks/pin_mask.cpp
         src/core/move_gen.cpp
+        src/core/perft.cpp
 )
 
 target_include_directories(Kitsune-Engine

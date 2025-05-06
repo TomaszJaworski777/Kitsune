@@ -36,5 +36,5 @@ PinMask::PinMask( const Board &board, const SideToMove defenderSide ) {
 		}
 	} );
 
-	m_DiagonalMask = result;
+	m_OrthographicMask = result;
 }

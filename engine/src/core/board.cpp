@@ -5,6 +5,8 @@
 
 #include <format>
 
+#include "KitsuneEngine/core/attacks/attacks.h"
+
 Board::Board() {
 	m_Occupancy[WHITE] = Bitboard::RANK_1 | Bitboard::RANK_2;
 	m_Occupancy[BLACK] = Bitboard::RANK_7 | Bitboard::RANK_8;
@@ -27,7 +29,7 @@ Board::Board() {
 	m_HalfMoves = 0;
 	m_Phase = 24;
 
-	m_Hash = 0x325bf1eb13d84627;
+	m_Hash = 0x325BF1EB13D84627;
 
 	m_PinMask = PinMask( *this, m_Side );
 }
@@ -69,7 +71,11 @@ Board::Board( const FEN &fen ) {
 		m_Side = BLACK;
 	}
 
-	//TODO: If king opposite king is attacked, mark as illegal position
+	if ( Attacks::IsSquareAttacked( *this, GetKingSquare( ~m_Side ), ~m_Side ) ) {
+		printf( "Tried to parse illegal position. Defaulting to starting position instead." );
+		*this = Board();
+		return;
+	}
 
 	m_CastleRights = 0;
 	if ( fen.GetCastleRights().contains( 'k' ) ) {
@@ -231,4 +237,6 @@ void Board::MakeMove( const Move &move ) {
 	}
 
 	m_Side = ~m_Side;
+
+	m_PinMask = PinMask( *this, m_Side );
 }

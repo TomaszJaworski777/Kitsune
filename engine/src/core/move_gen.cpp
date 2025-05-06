@@ -78,7 +78,10 @@ uint8_t MoveGenerator::GenerateNoisyMoves( Move *moves ) const {
 		moves = GetPieceMoves( moves, m_Board, BISHOP, captureMap, diagPins, orthoPins, CAPTURE_FLAG, m_Side );
 		moves = GetPieceMoves( moves, m_Board, ROOK, captureMap, diagPins, orthoPins, CAPTURE_FLAG, m_Side );
 	} else if ( !( m_Checkers & ( m_Checkers - 1 ) ) ) {
-		moves = GetNoisyPawnMoves( moves, m_Board, Bitboard::EMPTY, m_Checkers, diagPins, orthoPins, m_Side, m_OppositeSide,
+		const auto checker = m_Checkers.Ls1bSquare();
+		const auto pushMap = Rays::GetRayExcludeDestination( m_KingSquare, checker );
+
+		moves = GetNoisyPawnMoves( moves, m_Board, pushMap, m_Checkers, diagPins, orthoPins, m_Side, m_OppositeSide,
 		                           m_KingSquare );
 		moves = GetPieceMoves( moves, m_Board, KNIGHT, m_Checkers, diagPins, orthoPins, CAPTURE_FLAG, m_Side );
 		moves = GetPieceMoves( moves, m_Board, BISHOP, m_Checkers, diagPins, orthoPins, CAPTURE_FLAG, m_Side );
@@ -139,6 +142,7 @@ Move* GetQuietPawnMoves( Move *moves, const Board &board, const Bitboard pushMap
 
 	const Bitboard singlePushMap = side == WHITE ? pushMap >> 8 : pushMap << 8;
 	const Bitboard doublePushMap = side == WHITE ? pushMap >> 16 : pushMap << 16;
+	const Bitboard singlePushEmptyMap = side == WHITE ? ~board.GetOccupancy() >> 8 : ~board.GetOccupancy() << 8;
 
 	Bitboard pawns = movablePawns & singlePushMap;
 	Bitboard targets = side == WHITE ? pawns << 8 : pawns >> 8 ;
@@ -147,7 +151,7 @@ Move* GetQuietPawnMoves( Move *moves, const Board &board, const Bitboard pushMap
 		*( moves++ ) = Move( a.PopLs1bBit(), b.PopLs1bBit(), QUIET_MOVE_FLAG );
 	}
 
-	pawns = doublePushPawns & singlePushMap & doublePushMap;
+	pawns = doublePushPawns & singlePushEmptyMap & doublePushMap;
 	targets = side == WHITE ? pawns << 16 : pawns >> 16 ;
 	a = Bitboard( pawns ), b = Bitboard( targets );
 	while ( a ) {
@@ -206,7 +210,7 @@ Move* GetNoisyPawnMoves( Move *moves, const Board &board, const Bitboard pushMap
 		*( moves++ ) = Move( from, to, QUEEN_PROMOTION_CAPTURE_FLAG );
 	}
 
-	capturePawns = rightAttackPawns & rightShiftedCaptureMap;
+	capturePawns = rightPromotionPawns & rightShiftedCaptureMap;
 	targets = side == WHITE ? capturePawns << 9 : capturePawns >> 7;
 	a = Bitboard( capturePawns ), b = Bitboard( targets );
 	while ( a ) {
@@ -217,8 +221,9 @@ Move* GetNoisyPawnMoves( Move *moves, const Board &board, const Bitboard pushMap
 		*( moves++ ) = Move( from, to, QUEEN_PROMOTION_CAPTURE_FLAG );
 	}
 
-	const Bitboard promotionPawns = pawns & promotionRank & ~diagPins;
+	Bitboard promotionPawns = pawns & promotionRank & ~diagPins;
 	targets = ( side == WHITE ? promotionPawns << 8 : promotionPawns >> 8 ) & pushMap;
+	promotionPawns = side == WHITE ? targets >> 8 : targets << 8;
 	a = Bitboard( promotionPawns ), b = Bitboard( targets );
 	while ( a ) {
 		const Square from = a.PopLs1bBit(), to = b.PopLs1bBit();
