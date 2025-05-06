@@ -1,9 +1,10 @@
 #pragma once
 
 #include "bitboard.h"
+#include "move.h"
 #include "zobrist_hash.h"
 #include "../types.h"
-#include "../attacks/pin_mask.h"
+#include "attacks/pin_mask.h"
 
 struct FEN;
 
@@ -137,4 +138,6 @@ class Board {
 
 		[[nodiscard]]
 		std::string ToString() const;
+
+		void MakeMove( const Move &move );
 };

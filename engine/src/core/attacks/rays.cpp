@@ -1,4 +1,4 @@
-#include "KitsuneEngine/attacks/rays.h"
+#include "KitsuneEngine/core/attacks/rays.h"
 
 #pragma region Pregenerated Data
 static uint64_t RAYS[4096]{
@@ -305,6 +305,6 @@ Bitboard Rays::GetRay( const Square from, const Square to ) {
 	return RAYS[from * 64 + to];
 }
 
-Bitboard Rays::GetRayWithoutDestination( const Square from, const Square to ) {
+Bitboard Rays::GetRayExcludeDestination( const Square from, const Square to ) {
 	return RAYS[from * 64 + to] & ~Bitboard( to );
 }

@@ -1,4 +1,4 @@
-#include "KitsuneEngine/attacks/attacks.h"
+#include "KitsuneEngine/core/attacks/attacks.h"
 
 static uint64_t KNIGHT_MOVES[64]{
 	0x20400, 0x50800, 0xa1100, 0x142200, 0x284400, 0x508800, 0xa01000, 0x402000, 0x2040004, 0x5080008, 0xa110011,

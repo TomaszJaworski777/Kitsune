@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "KitsuneEngine/attacks/attacks.h"
+#include "KitsuneEngine/core/attacks/attacks.h"
 
 #if PEXT
 #include <immintrin.h>
@@ -8,8 +8,6 @@
 #else
 #include "attack_arrays/rook_attacks.h"
 #endif
-
-extern const uint64_t ATTACKS[4096 * 64];
 
 #if !PEXT
 static uint8_t ROOK_OCCUPANCY_COUNT[64]{

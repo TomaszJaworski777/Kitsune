@@ -1,4 +1,4 @@
-#include "KitsuneEngine/attacks/attacks.h"
+#include "KitsuneEngine/core/attacks/attacks.h"
 
 #if PEXT
 #include <immintrin.h>
@@ -6,8 +6,6 @@
 #else
 #include "attack_arrays/bishop_attacks.h"
 #endif
-
-extern const uint64_t ATTACKS[512 * 64];
 
 #if !PEXT
 static uint8_t BISHOP_OCCUPANCY_COUNT[64]{

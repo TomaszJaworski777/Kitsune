@@ -7,5 +7,5 @@ struct Rays {
 		static Bitboard GetRay( Square from, Square to );
 
 		[[nodiscard]]
-		static Bitboard GetRayWithoutDestination( Square from, Square to );
+		static Bitboard GetRayExcludeDestination( Square from, Square to );
 };

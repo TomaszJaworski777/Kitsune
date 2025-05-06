@@ -151,7 +151,7 @@ std::string Board::ToString() const {
 		for ( int file = 0; file < 8; file++ ) {
 			const auto square = Square( rank, file );
 			if ( square == m_enPassantSquare ) {
-				result += 'x';
+				result += " x";
 				continue;
 			}
 
@@ -170,4 +170,65 @@ std::string Board::ToString() const {
 
 	result += " -----------------\n";
 	return result;
+}
+
+void Board::MakeMove( const Move &move ) {
+	const Square fromSquare = move.GetFromSquare();
+	const Square toSquare = move.GetToSquare();
+	const MoveFlag moveFlag = move.GetFlag();
+	const bool isPromotion = move.IsPromotion();
+	const bool isCapture = move.IsCapture();
+	const SideToMove oppositeSideToMove = ~m_Side;
+	const PieceType movedPiece = GetPieceOnSquare( fromSquare );
+	const PieceType capturedPiece = GetPieceOnSquare( toSquare );
+
+	if ( capturedPiece != NULL_PIECE ) {
+		RemovePieceOnSquare( toSquare, capturedPiece, oppositeSideToMove );
+	}
+
+	RemovePieceOnSquare( fromSquare, movedPiece, m_Side );
+	if ( !isPromotion ) {
+		SetPieceOnSquare( toSquare, movedPiece, m_Side );
+	}
+
+	if ( movedPiece == PAWN || isCapture ) {
+		m_HalfMoves = 0;
+	} else {
+		m_HalfMoves++;
+	}
+
+	m_CastleRights &= ~( CASTLE_MASK[fromSquare] | CASTLE_MASK[toSquare] );
+	m_enPassantSquare = NULL_SQUARE;
+
+	const uint8_t sideFlip = 56 * m_Side;
+	switch ( moveFlag ) {
+		case DOUBLE_PUSH_FLAG:
+			m_enPassantSquare = toSquare ^ 8;
+			break;
+		case QUEEN_SIDE_CASTLE_FLAG:
+			RemovePieceOnSquare( sideFlip, ROOK, m_Side );
+			SetPieceOnSquare( sideFlip + 3, ROOK, m_Side );
+			break;
+		case KING_SIDE_CASTLE_FLAG:
+			RemovePieceOnSquare( sideFlip + 7, ROOK, m_Side );
+			SetPieceOnSquare( sideFlip + 5, ROOK, m_Side );
+			break;
+		case EN_PASSANT_FLAG:
+			RemovePieceOnSquare( toSquare ^ 8, PAWN, oppositeSideToMove );
+			break;
+		case KNIGHT_PROMOTION_FLAG:
+		case BISHOP_PROMOTION_FLAG:
+		case ROOK_PROMOTION_FLAG:
+		case QUEEN_PROMOTION_FLAG:
+		case KNIGHT_PROMOTION_CAPTURE_FLAG:
+		case BISHOP_PROMOTION_CAPTURE_FLAG:
+		case ROOK_PROMOTION_CAPTURE_FLAG:
+		case QUEEN_PROMOTION_CAPTURE_FLAG:
+			SetPieceOnSquare( toSquare, move.GetPromotionPieceType(), m_Side );
+			break;
+		default:
+			break;
+	}
+
+	m_Side = ~m_Side;
 }

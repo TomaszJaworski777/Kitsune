@@ -1,4 +1,4 @@
-#include "KitsuneEngine/attacks/attacks.h"
+#include "KitsuneEngine/core/attacks/attacks.h"
 
 #include "KitsuneEngine/core/board.h"
 

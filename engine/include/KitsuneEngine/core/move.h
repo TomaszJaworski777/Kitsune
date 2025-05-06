@@ -16,7 +16,7 @@ struct Move {
 		}
 
 		Move( const Square from, const Square to, const MoveFlag flag ) {
-			m_Value = to << 10 | flag| from;
+			m_Value = to << 10 | flag | from;
 		}
 
 		[[nodiscard]]
@@ -36,17 +36,17 @@ struct Move {
 
 		[[nodiscard]]
 		bool IsCapture() const {
-			return m_Value & CAPTURE;
+			return m_Value & CAPTURE_FLAG;
 		}
 
 		[[nodiscard]]
 		bool IsEnPassant() const {
-			return (m_Value & EN_PASSANT) == EN_PASSANT;
+			return (m_Value & EN_PASSANT_FLAG) == EN_PASSANT_FLAG;
 		}
 
 		[[nodiscard]]
 		bool IsPromotion() const {
-			return m_Value & KNIGHT_PROMOTION;
+			return m_Value & KNIGHT_PROMOTION_FLAG;
 		}
 
 		[[nodiscard]]
