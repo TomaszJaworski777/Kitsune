@@ -30,8 +30,6 @@ Board::Board() {
 	m_Phase = 24;
 
 	m_Hash = 0x325BF1EB13D84627;
-
-	m_PinMask = PinMask( *this, m_Side );
 }
 
 Board::Board( const FEN &fen ) {
@@ -97,8 +95,6 @@ Board::Board( const FEN &fen ) {
 	}
 
 	m_HalfMoves = std::stoi( fen.GetHalfMoveCounter() );
-
-	m_PinMask = PinMask( *this, m_Side );
 }
 
 bool Board::IsInsufficientMaterial() const {
@@ -237,6 +233,4 @@ void Board::MakeMove( const Move &move ) {
 	}
 
 	m_Side = ~m_Side;
-
-	m_PinMask = PinMask( *this, m_Side );
 }

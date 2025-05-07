@@ -2,6 +2,7 @@
 
 #include "bitboard.h"
 #include "move.h"
+#include "attacks/pin_mask.h"
 
 class Board;
 
@@ -11,6 +12,7 @@ struct MoveGenerator {
 		const SideToMove m_Side;
 		const SideToMove m_OppositeSide;
 		const Square m_KingSquare;
+		const PinMask m_PinMask;
 		const Bitboard m_AttackMap;
 		const Bitboard m_Checkers;
 		const Bitboard m_KingMoveMap;

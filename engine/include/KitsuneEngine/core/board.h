@@ -4,7 +4,6 @@
 #include "move.h"
 #include "zobrist_hash.h"
 #include "../types.h"
-#include "attacks/pin_mask.h"
 
 struct FEN;
 
@@ -12,7 +11,6 @@ class Board {
 	private:
 		Bitboard m_Occupancy[2];
 		Bitboard m_Pieces[6];
-		PinMask m_PinMask;
 		ZobristHash m_Hash;
 		SideToMove m_Side;
 		uint8_t m_CastleRights;
@@ -24,11 +22,6 @@ class Board {
 		Board();
 
 		Board( const FEN &fen );
-
-		[[nodiscard]]
-		PinMask GetPinMask() const {
-			return m_PinMask;
-		}
 
 		[[nodiscard]]
 		uint64_t GetHash() const {

@@ -2,11 +2,13 @@
 
 #include "KitsuneEngine/core/board.h"
 #include "KitsuneEngine/core/attacks/attacks.h"
+#include "KitsuneEngine/core/attacks/pin_mask.h"
 #include "KitsuneEngine/core/attacks/rays.h"
 
 MoveGenerator::MoveGenerator( const Board &board ) : m_Board( board ), m_Side( board.GetSideToMove() ),
                                                      m_OppositeSide( ~m_Side ),
                                                      m_KingSquare( board.GetKingSquare( m_Side ) ),
+													 m_PinMask( m_Board, m_Side ),
                                                      m_AttackMap( Attacks::GenerateAttackMap( m_Board, m_Side ) ),
                                                      m_Checkers( m_AttackMap.GetBit( m_KingSquare )
 	                                                                 ? Attacks::GenerateCheckersMask( m_Board )
@@ -33,8 +35,8 @@ Move* GetPieceMoves( Move *moves, const Board &board, PieceType piece, Bitboard 
 uint8_t MoveGenerator::GenerateQuietMoves( Move *moves ) const {
 	const Move *start = moves;
 
-	const auto diagPins = m_Board.GetPinMask().GetDiagonalMask();
-	const auto orthoPins = m_Board.GetPinMask().GetOrthographicMask();
+	const auto diagPins = m_PinMask.GetDiagonalMask();
+	const auto orthoPins = m_PinMask.GetOrthographicMask();
 
 	moves = GetQuietKingMoves( moves, m_KingMoveMap & ~m_Board.GetOccupancy(), m_KingSquare );
 
@@ -63,8 +65,8 @@ uint8_t MoveGenerator::GenerateQuietMoves( Move *moves ) const {
 uint8_t MoveGenerator::GenerateNoisyMoves( Move *moves ) const {
 	const Move *start = moves;
 
-	const auto diagPins = m_Board.GetPinMask().GetDiagonalMask();
-	const auto orthoPins = m_Board.GetPinMask().GetOrthographicMask();
+	const auto diagPins = m_PinMask.GetDiagonalMask();
+	const auto orthoPins = m_PinMask.GetOrthographicMask();
 	const auto captureMap = m_Board.GetOccupancy( m_OppositeSide );
 
 	moves = GetNoisyKingMoves( moves, m_KingMoveMap & captureMap, m_KingSquare );

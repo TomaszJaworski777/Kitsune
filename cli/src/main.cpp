@@ -15,11 +15,11 @@ int main() {
 	infos[6] = "and Dorian Kernel";
 	infos[8] = "Version: 0.1";
 	infos[11] = "Supported Non-UCI Commands:";
-	infos[12] = "	perft <depth>";
-	infos[13] = "	bulk <depth>";
-	infos[14] = "	bench <depth>";
-	infos[15] = "	eval";
-	infos[16] = "	draw";
+	infos[12] = "   perft <depth>";
+	infos[13] = "   bulk <depth>";
+	infos[14] = "   bench <depth>";
+	infos[15] = "   eval";
+	infos[16] = "   draw";
 	std::cout << "\n" << GetASCIILogo( infos ) << std::endl << std::endl;
 
 	auto board = Board( FEN() );
