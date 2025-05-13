@@ -1,7 +1,7 @@
 #pragma once
 
-#include "KitsuneEngine/core/bitboard.h"
 #include "../../engine/src/core/attacks/rays_arrays.h"
+#include "KitsuneEngine/core/bitboard.h"
 
 struct Rays {
 	public:

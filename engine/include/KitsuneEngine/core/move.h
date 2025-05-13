@@ -10,6 +10,7 @@ static constexpr uint16_t FLAG_MASK = 15 << 6;
 struct Move {
 	private:
 		uint16_t m_Value;
+
 	public:
 		constexpr Move( const uint16_t value = 0 ) {
 			m_Value = value;
@@ -41,7 +42,7 @@ struct Move {
 
 		[[nodiscard]]
 		constexpr bool IsEnPassant() const {
-			return (m_Value & EN_PASSANT_FLAG) == EN_PASSANT_FLAG;
+			return ( m_Value & EN_PASSANT_FLAG ) == EN_PASSANT_FLAG;
 		}
 
 		[[nodiscard]]
@@ -51,7 +52,7 @@ struct Move {
 
 		[[nodiscard]]
 		constexpr PieceType GetPromotionPieceType() const {
-			return static_cast<PieceType>( ( GetFlag() >> 6 & 3 ) + 1 );
+			return static_cast<PieceType>(( GetFlag() >> 6 & 3 ) + 1);
 		}
 
 		[[nodiscard]]
@@ -61,7 +62,7 @@ struct Move {
 			return m_Value;
 		}
 
-		constexpr Move& operator=(const uint16_t value) {
+		constexpr Move& operator=( const uint16_t value ) {
 			m_Value = value;
 			return *this;
 		}

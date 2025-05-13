@@ -8,6 +8,7 @@ extern const uint64_t SEEDS[793];
 struct ZobristHash {
 	private:
 		uint64_t m_Value = 0;
+
 	public:
 		constexpr void UpdatePieceHash( const PieceType pieceType, const SideToMove pieceColor, const Square square ) {
 			m_Value ^= SEEDS[( pieceType + pieceColor * 6 ) * 64 + square];
@@ -29,7 +30,7 @@ struct ZobristHash {
 			return m_Value;
 		}
 
-		constexpr ZobristHash &operator=( const uint64_t value ) {
+		constexpr ZobristHash& operator=( const uint64_t value ) {
 			m_Value = value;
 			return *this;
 		}

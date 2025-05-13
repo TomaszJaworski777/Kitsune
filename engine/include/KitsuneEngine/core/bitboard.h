@@ -107,7 +107,7 @@ struct Bitboard {
             return m_Value;
         }
 
-        constexpr Bitboard &operator=( const uint64_t value ) {
+        constexpr Bitboard& operator=( const uint64_t value ) {
             m_Value = value;
             return *this;
         }
@@ -128,22 +128,22 @@ struct Bitboard {
             return Bitboard{ m_Value | value };
         }
 
-        constexpr Bitboard &operator&=( const Bitboard value ) {
+        constexpr Bitboard& operator&=( const Bitboard value ) {
             m_Value &= value.m_Value;
             return *this;
         }
 
-        constexpr Bitboard &operator|=( const Bitboard value ) {
+        constexpr Bitboard& operator|=( const Bitboard value ) {
             m_Value |= value.m_Value;
             return *this;
         }
 
-        constexpr Bitboard &operator&=( const uint64_t value ) {
+        constexpr Bitboard& operator&=( const uint64_t value ) {
             m_Value &= value;
             return *this;
         }
 
-        constexpr Bitboard &operator|=( const uint64_t value ) {
+        constexpr Bitboard& operator|=( const uint64_t value ) {
             m_Value |= value;
             return *this;
         }

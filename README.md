@@ -1,10 +1,10 @@
 <div align="center">
 
 <img
-  width="200"
-  alt="Kitsune Logo"
-  src=".readme/logos/kitsune_round_corners.png">
- 
+width="200"
+alt="Kitsune Logo"
+src=".readme/logos/kitsune_round_corners.png">
+
 <h3>Kitsune</h3>
 <b>"Quick as a fox."</b>
 <br>
@@ -17,7 +17,7 @@
 <br>
 
 | Version | CCRL Blitz | CCRL 40/15 | CEGT 40/20 | Release Date |
-| :-: | :-: | :-: | :-: | :-: |
+|:-------:|:----------:|:----------:|:----------:|:------------:|
 
 <i>* estimated in 40+0.4 gauntlet</i>
 

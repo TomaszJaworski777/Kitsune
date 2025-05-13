@@ -66,7 +66,7 @@ struct Square {
 			return m_Value;
 		}
 
-		constexpr Square &operator=( const uint8_t value ) {
+		constexpr Square& operator=( const uint8_t value ) {
 			m_Value = value;
 			return *this;
 		}
