@@ -3,12 +3,12 @@
 #include "KitsuneEngine/core/board.h"
 #include "KitsuneEngine/core/attacks/attacks.h"
 #include "KitsuneEngine/core/attacks/pin_mask.h"
-#include "KitsuneEngine/core/attacks/rays.h"
+#include "KitsuneEngine/core/attacks/rays_arrays.h"
 
 MoveGenerator::MoveGenerator( const Board &board ) : m_Board( board ), m_Side( board.GetSideToMove() ),
                                                      m_OppositeSide( ~m_Side ),
                                                      m_KingSquare( board.GetKingSquare( m_Side ) ),
-													 m_PinMask( m_Board, m_Side ),
+                                                     m_PinMask( m_Board, m_Side ),
                                                      m_AttackMap( Attacks::GenerateAttackMap( m_Board, m_Side ) ),
                                                      m_Checkers( m_AttackMap.GetBit( m_KingSquare )
 	                                                                 ? Attacks::GenerateCheckersMask( m_Board )

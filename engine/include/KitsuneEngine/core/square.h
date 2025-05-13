@@ -21,37 +21,37 @@ struct Square {
 		uint8_t m_Value;
 
 	public:
-		Square( const uint8_t value = NULL_SQUARE ) {
+		constexpr Square( const uint8_t value = NULL_SQUARE ) {
 			m_Value = value;
 		}
 
-		Square( const uint8_t rank, const uint8_t file ) {
+		constexpr Square( const uint8_t rank, const uint8_t file ) {
 			m_Value = rank * 8 + file;
 		}
 
-		Square( const std::string_view &value ) {
+		constexpr Square( const std::string_view &value ) {
 			const uint8_t file = std::ranges::clamp( value[0] - 'a', 0, 7 );
 			const uint8_t rank = std::ranges::clamp( value[1] - '0' - 1, 0, 7 );
 			m_Value = rank * 8 + file;
 		}
 
 		[[nodiscard]]
-		uint8_t GetRank() const {
+		constexpr uint8_t GetRank() const {
 			return m_Value / 8;
 		}
 
 		[[nodiscard]]
-		uint8_t GetFile() const {
+		constexpr uint8_t GetFile() const {
 			return m_Value % 8;
 		}
 
 		[[nodiscard]]
-		uint8_t Flipped() const {
+		constexpr uint8_t Flipped() const {
 			return m_Value ^ 56;
 		}
 
 		[[nodiscard]]
-		std::string ToString() const {
+		constexpr std::string ToString() const {
 			if ( m_Value == NULL_SQUARE ) {
 				return "-";
 			}
@@ -62,11 +62,11 @@ struct Square {
 			return result;
 		}
 
-		operator uint8_t() const {
+		constexpr operator uint8_t() const {
 			return m_Value;
 		}
 
-		Square &operator=( const uint8_t value ) {
+		constexpr Square &operator=( const uint8_t value ) {
 			m_Value = value;
 			return *this;
 		}

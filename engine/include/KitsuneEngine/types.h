@@ -7,7 +7,7 @@ enum SideToMove : uint8_t {
 	BLACK = 1,
 };
 
-static SideToMove operator~( const SideToMove stm ) {
+constexpr static SideToMove operator~( const SideToMove stm ) {
 	return static_cast<SideToMove>(1 - stm);
 }
 

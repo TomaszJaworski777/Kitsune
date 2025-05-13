@@ -2,7 +2,7 @@
 
 #include <string>
 
-std::string GetASCIILogo( const std::string* info ) {
+static constexpr std::string GetASCIILogo( const std::string* info ) {
     std::string logo;
 
     logo.append( "               @@@    @@            @@@                          " + info[0] + "\n" );

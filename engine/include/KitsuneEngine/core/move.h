@@ -11,57 +11,57 @@ struct Move {
 	private:
 		uint16_t m_Value;
 	public:
-		Move( const uint16_t value = 0 ) {
+		constexpr Move( const uint16_t value = 0 ) {
 			m_Value = value;
 		}
 
-		Move( const Square from, const Square to, const MoveFlag flag ) {
+		constexpr Move( const Square from, const Square to, const MoveFlag flag ) {
 			m_Value = to << 10 | flag | from;
 		}
 
 		[[nodiscard]]
-		Square GetFromSquare() const {
+		constexpr Square GetFromSquare() const {
 			return m_Value & 63;
 		}
 
 		[[nodiscard]]
-		Square GetToSquare() const {
+		constexpr Square GetToSquare() const {
 			return m_Value >> 10;
 		}
 
 		[[nodiscard]]
-		MoveFlag GetFlag() const {
+		constexpr MoveFlag GetFlag() const {
 			return static_cast<MoveFlag>(m_Value & FLAG_MASK);
 		}
 
 		[[nodiscard]]
-		bool IsCapture() const {
+		constexpr bool IsCapture() const {
 			return m_Value & CAPTURE_FLAG;
 		}
 
 		[[nodiscard]]
-		bool IsEnPassant() const {
+		constexpr bool IsEnPassant() const {
 			return (m_Value & EN_PASSANT_FLAG) == EN_PASSANT_FLAG;
 		}
 
 		[[nodiscard]]
-		bool IsPromotion() const {
+		constexpr bool IsPromotion() const {
 			return m_Value & KNIGHT_PROMOTION_FLAG;
 		}
 
 		[[nodiscard]]
-		PieceType GetPromotionPieceType() const {
+		constexpr PieceType GetPromotionPieceType() const {
 			return static_cast<PieceType>( ( GetFlag() >> 6 & 3 ) + 1 );
 		}
 
 		[[nodiscard]]
 		std::string ToString() const;
 
-		operator uint16_t() const {
+		constexpr operator uint16_t() const {
 			return m_Value;
 		}
 
-		Move& operator=(const uint16_t value) {
+		constexpr Move& operator=(const uint16_t value) {
 			m_Value = value;
 			return *this;
 		}
