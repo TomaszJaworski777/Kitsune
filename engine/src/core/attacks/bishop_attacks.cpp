@@ -50,5 +50,5 @@ Bitboard Attacks::GetBishopAttacks( const Square square, const Bitboard occupanc
 #else
 	const uint64_t index = _pext_u64(occupancy, mask);
 #endif
-	return ATTACKS[square * 512 + index];
+	return BISHOP_ATTACKS[square * 512 + index];
 }

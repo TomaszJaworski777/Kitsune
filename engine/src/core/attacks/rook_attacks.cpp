@@ -53,5 +53,5 @@ Bitboard Attacks::GetRookAttacks( const Square square, const Bitboard occupancy 
 #else
 	const uint64_t index = _pext_u64(occupancy, mask);
 #endif
-	return ATTACKS[square * 4096 + index];
+	return ROOK_ATTACKS[square * 4096 + index];
 }
