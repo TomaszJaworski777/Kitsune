@@ -22,12 +22,18 @@ int main() {
 	infos[16] = "   draw";
 	std::cout << "\n" << GetASCIILogo( infos ) << std::endl << std::endl;
 
-	auto board = Board( FEN() );
+	auto board = Board( FEN( ) );
 	std::cout << board.ToString() << std::endl;
 
-	auto thread = std::jthread( [&board]( std::stop_token token ) {
+	const auto castleRules = board.GetCastleRules();
+
+	for ( int x = 0; x < 64; x++ ) {
+		std::cout << static_cast<uint32_t>(CASTLE_MASK[x]) << " --> " << static_cast<uint32_t>(castleRules.GetMask( x )) << std::endl;
+	}
+
+	auto thread = std::jthread( [&board, &castleRules]( std::stop_token token ) {
 		auto t = std::chrono::high_resolution_clock::now();
-		uint64_t result = Perft( board, 6, false, true, true );
+		uint64_t result = Perft( board, castleRules, 6, false, true, true );
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::high_resolution_clock::now() - t );
 		std::cout << "Result: " << result << std::endl;
@@ -35,7 +41,7 @@ int main() {
 		std::cout << "Speed: " << ( result * 1000 / duration.count() ) << "nps" << std::endl << std::endl << std::endl;
 
 		t = std::chrono::high_resolution_clock::now();
-		result = Perft( board, 7, true, true, true );
+		result = Perft( board, castleRules, 7, true, true, true );
 		duration = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::high_resolution_clock::now() - t );
 		std::cout << "Result: " << result << std::endl;

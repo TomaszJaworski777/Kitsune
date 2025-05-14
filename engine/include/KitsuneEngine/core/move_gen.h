@@ -13,6 +13,7 @@
 struct MoveGenerator {
 	private:
 		const Board &m_Board;
+		const CastleRules &m_CastleRules;
 		const Square m_KingSquare;
 		const PinMask m_PinMask;
 		const Bitboard m_AttackMap;
@@ -20,7 +21,7 @@ struct MoveGenerator {
 		const Bitboard m_KingMoveMap;
 
 	public:
-		MoveGenerator( const Board &board );
+		MoveGenerator( const Board &board, const CastleRules &castleRules );
 
 		template<MoveGenMode MODE>
 		uint8_t GenerateMoves( Move *moves ) const {
@@ -187,7 +188,7 @@ struct MoveGenerator {
 			pawns.Map( [&moves, enPassantSquare, this]( const Square fromSquare ) {
 				Board temp = m_Board;
 				const auto mv = Move( fromSquare, enPassantSquare, EN_PASSANT_FLAG );
-				temp.MakeMove( mv );
+				temp.MakeMove( mv, m_CastleRules );
 
 				if ( !Attacks::IsSquareAttacked( temp, m_Board.GetKingSquare( SIDE ), SIDE ) ) {
 					( *moves++ ) = mv;

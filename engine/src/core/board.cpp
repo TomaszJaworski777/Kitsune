@@ -174,7 +174,7 @@ std::string Board::ToString() const {
 	return result;
 }
 
-void Board::MakeMove( const Move &move ) {
+void Board::MakeMove( const Move &move, const CastleRules &castleRules ) {
 	const Square fromSquare = move.GetFromSquare();
 	const Square toSquare = move.GetToSquare();
 	const MoveFlag moveFlag = move.GetFlag();
@@ -199,7 +199,7 @@ void Board::MakeMove( const Move &move ) {
 		m_HalfMoves++;
 	}
 
-	m_CastleRights &= ~( CASTLE_MASK[fromSquare] | CASTLE_MASK[toSquare] );
+	m_CastleRights &= ~( castleRules.GetMask( fromSquare ) | castleRules.GetMask( toSquare ) );
 	m_enPassantSquare = NULL_SQUARE;
 
 	const uint8_t sideFlip = 56 * m_Side;

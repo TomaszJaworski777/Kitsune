@@ -6,14 +6,15 @@
 #include "KitsuneEngine/core/board.h"
 #include "KitsuneEngine/core/move_gen.h"
 
-uint64_t Perft( const Board &board, const uint8_t depth, const bool bulk, const bool printSplit, const bool isFirst ) {
+uint64_t Perft( const Board &board, const CastleRules &castleRules, const uint8_t depth, const bool bulk, const bool printSplit,
+                const bool isFirst ) {
 	if ( depth == 0 ) {
 		return 1;
 	}
 
 	Move moves[MAX_MOVES]{ };
 	uint8_t movesCount = 0;
-	const auto moveGenerator = MoveGenerator( board );
+	const auto moveGenerator = MoveGenerator( board, castleRules );
 	movesCount = moveGenerator.GenerateMoves<MoveGenMode::ALL>( moves );
 
 	if ( depth == 1 && bulk ) {
@@ -25,8 +26,8 @@ uint64_t Perft( const Board &board, const uint8_t depth, const bool bulk, const 
 	for ( uint8_t i = 0; i < movesCount; ++i ) {
 		Board newBoard = board;
 		Move move = moves[i];
-		newBoard.MakeMove( move );
-		const uint64_t split = Perft( newBoard, depth - 1, bulk, printSplit, false );
+		newBoard.MakeMove( move, castleRules );
+		const uint64_t split = Perft( newBoard, castleRules, depth - 1, bulk, printSplit, false );
 
 		result += split;
 
@@ -37,4 +38,3 @@ uint64_t Perft( const Board &board, const uint8_t depth, const bool bulk, const 
 
 	return result;
 }
-

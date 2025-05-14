@@ -1,6 +1,6 @@
 find_package(Catch2 3 REQUIRED)
 
-add_executable(Kitsune-Tests Perft.cpp)
+add_executable(Kitsune-Tests standard.cpp)
 
 target_link_libraries(Kitsune-Tests PRIVATE Kitsune-Engine)
 target_link_libraries(Kitsune-Tests PRIVATE Catch2::Catch2WithMain)

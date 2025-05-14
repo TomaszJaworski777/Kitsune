@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bitboard.h"
+#include "castle_rules.h"
 #include "move.h"
 #include "zobrist_hash.h"
 #include "../types.h"
@@ -59,6 +60,7 @@ class Board {
 
 		[[nodiscard]]
 		constexpr Square GetPhase() const {
+			;
 			return m_Phase;
 		}
 
@@ -121,10 +123,16 @@ class Board {
 		}
 
 		[[nodiscard]]
+		constexpr CastleRules GetCastleRules() const {
+			return CastleRules( GetPieceMask( ROOK, WHITE ), GetPieceMask( ROOK, BLACK ),
+			               GetKingSquare( WHITE ), GetKingSquare( BLACK ) );
+		}
+
+		[[nodiscard]]
 		bool IsInsufficientMaterial() const;
 
 		[[nodiscard]]
 		std::string ToString() const;
 
-		void MakeMove( const Move &move );
+		void MakeMove( const Move &move, const CastleRules &castleRules );
 };

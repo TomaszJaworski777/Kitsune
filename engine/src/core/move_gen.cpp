@@ -4,14 +4,10 @@
 #include "KitsuneEngine/core/attacks/attacks.h"
 #include "KitsuneEngine/core/attacks/pin_mask.h"
 
-MoveGenerator::MoveGenerator( const Board &board ) : m_Board( board ),
-                                                     m_KingSquare( board.GetKingSquare( m_Board.GetSideToMove() ) ),
-                                                     m_PinMask( m_Board, m_Board.GetSideToMove() ),
-                                                     m_AttackMap( Attacks::GenerateAttackMap(
-	                                                     m_Board, m_Board.GetSideToMove() ) ),
-                                                     m_Checkers( m_AttackMap.GetBit( m_KingSquare )
-	                                                                 ? Attacks::GenerateCheckersMask( m_Board )
-	                                                                 : Bitboard( Bitboard::EMPTY ) ),
-                                                     m_KingMoveMap(
-	                                                     Attacks::GetKingAttacks( m_KingSquare ) & ~m_AttackMap ) {
+MoveGenerator::MoveGenerator( const Board &board, const CastleRules &castleRules )
+	: m_Board( board ), m_CastleRules( castleRules ), m_KingSquare( board.GetKingSquare( m_Board.GetSideToMove() ) ),
+	  m_PinMask( m_Board, m_Board.GetSideToMove() ),
+	  m_AttackMap( Attacks::GenerateAttackMap( m_Board, m_Board.GetSideToMove() ) ),
+	  m_Checkers( m_AttackMap.GetBit( m_KingSquare ) ? Attacks::GenerateCheckersMask( m_Board ) : Bitboard( Bitboard::EMPTY ) ),
+	  m_KingMoveMap( Attacks::GetKingAttacks( m_KingSquare ) & ~m_AttackMap ) {
 }
