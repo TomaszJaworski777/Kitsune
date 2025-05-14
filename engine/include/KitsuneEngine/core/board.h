@@ -134,5 +134,97 @@ class Board {
 		[[nodiscard]]
 		std::string ToString() const;
 
-		void MakeMove( const Move &move, const CastleRules &castleRules );
+		constexpr void MakeMove( const Move &move, const CastleRules &castleRules ) {
+			if ( m_Side == WHITE ) {
+				MakeMove_Side<WHITE>( move, castleRules );
+			} else {
+				MakeMove_Side<BLACK>( move, castleRules );
+			}
+		}
+
+	private:
+		template<SideToMove SIDE>
+		constexpr void MakeMove_Side( const Move &move, const CastleRules &castleRules ) {
+			switch ( move.GetFlag() ) {
+				case QUIET_MOVE_FLAG: MakeMove_Flag<SIDE, QUIET_MOVE_FLAG>( move, castleRules ); break;
+				case DOUBLE_PUSH_FLAG: MakeMove_Flag<SIDE, DOUBLE_PUSH_FLAG>( move, castleRules ); break;
+				case KING_SIDE_CASTLE_FLAG: MakeMove_Flag<SIDE, KING_SIDE_CASTLE_FLAG>( move, castleRules ); break;
+				case QUEEN_SIDE_CASTLE_FLAG: MakeMove_Flag<SIDE, QUEEN_SIDE_CASTLE_FLAG>( move, castleRules ); break;
+				case CAPTURE_FLAG: MakeMove_Flag<SIDE, CAPTURE_FLAG>( move, castleRules ); break;
+				case EN_PASSANT_FLAG: MakeMove_Flag<SIDE, EN_PASSANT_FLAG>( move, castleRules ); break;
+				case KNIGHT_PROMOTION_FLAG: MakeMove_Flag<SIDE, KNIGHT_PROMOTION_FLAG>( move, castleRules ); break;
+				case BISHOP_PROMOTION_FLAG: MakeMove_Flag<SIDE, BISHOP_PROMOTION_FLAG>( move, castleRules ); break;
+				case ROOK_PROMOTION_FLAG: MakeMove_Flag<SIDE, ROOK_PROMOTION_FLAG>( move, castleRules ); break;
+				case QUEEN_PROMOTION_FLAG: MakeMove_Flag<SIDE, QUEEN_PROMOTION_FLAG>( move, castleRules ); break;
+				case KNIGHT_PROMOTION_CAPTURE_FLAG: MakeMove_Flag<SIDE, KNIGHT_PROMOTION_CAPTURE_FLAG>( move, castleRules ); break;
+				case BISHOP_PROMOTION_CAPTURE_FLAG: MakeMove_Flag<SIDE, BISHOP_PROMOTION_CAPTURE_FLAG>( move, castleRules ); break;
+				case ROOK_PROMOTION_CAPTURE_FLAG: MakeMove_Flag<SIDE, ROOK_PROMOTION_CAPTURE_FLAG>( move, castleRules ); break;
+				case QUEEN_PROMOTION_CAPTURE_FLAG: MakeMove_Flag<SIDE, QUEEN_PROMOTION_CAPTURE_FLAG>( move, castleRules ); break;
+				default: break;
+			}
+		}
+
+		template<SideToMove SIDE, MoveFlag FLAG>
+		constexpr void MakeMove_Flag( const Move &move, const CastleRules &castleRules )   {
+			const Square fromSquare = move.GetFromSquare();
+			const Square toSquare = move.GetToSquare();
+
+			const bool isPromotion = (FLAG & KNIGHT_PROMOTION_FLAG) > 0 ;
+			const bool isCastle = FLAG == KING_SIDE_CASTLE_FLAG || FLAG == QUEEN_SIDE_CASTLE_FLAG;
+
+			const PieceType movedPiece = GetPieceOnSquare( fromSquare );
+			const PieceType capturedPiece = GetPieceOnSquare( toSquare );
+
+			if ( capturedPiece != NULL_PIECE ) {
+				RemovePieceOnSquare( toSquare, capturedPiece, ~SIDE );
+			}
+
+			RemovePieceOnSquare( fromSquare, movedPiece, SIDE );
+			if ( !isPromotion && !isCastle ) {
+				SetPieceOnSquare( toSquare, movedPiece, SIDE );
+			}
+
+			if ( movedPiece == PAWN || (FLAG & CAPTURE_FLAG) > 0 ) {
+				m_HalfMoves = 0;
+			} else {
+				m_HalfMoves++;
+			}
+
+			m_CastleRights &= ~( castleRules.GetMask( fromSquare ) | castleRules.GetMask( toSquare ) );
+			m_enPassantSquare = NULL_SQUARE;
+
+			const uint8_t sideFlip = 56 * SIDE;
+			switch ( FLAG ) {
+				case DOUBLE_PUSH_FLAG:
+					m_enPassantSquare = toSquare ^ 8;
+					break;
+				case QUEEN_SIDE_CASTLE_FLAG:
+					RemovePieceOnSquare( sideFlip, ROOK, SIDE );
+					SetPieceOnSquare( sideFlip + 3, ROOK, SIDE );
+					SetPieceOnSquare( sideFlip + 2, KING, SIDE );
+					break;
+				case KING_SIDE_CASTLE_FLAG:
+					RemovePieceOnSquare( sideFlip + 7, ROOK, SIDE );
+					SetPieceOnSquare( sideFlip + 5, ROOK, SIDE );
+					SetPieceOnSquare( sideFlip + 6, KING, SIDE );
+					break;
+				case EN_PASSANT_FLAG:
+					RemovePieceOnSquare( toSquare ^ 8, PAWN, ~SIDE );
+					break;
+				case KNIGHT_PROMOTION_FLAG:
+				case BISHOP_PROMOTION_FLAG:
+				case ROOK_PROMOTION_FLAG:
+				case QUEEN_PROMOTION_FLAG:
+				case KNIGHT_PROMOTION_CAPTURE_FLAG:
+				case BISHOP_PROMOTION_CAPTURE_FLAG:
+				case ROOK_PROMOTION_CAPTURE_FLAG:
+				case QUEEN_PROMOTION_CAPTURE_FLAG:
+					SetPieceOnSquare( toSquare, move.GetPromotionPieceType(), SIDE );
+					break;
+				default:
+					break;
+			}
+
+			m_Side = ~SIDE;
+		}
 };
