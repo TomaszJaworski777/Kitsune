@@ -7,11 +7,11 @@ add_library(Kitsune-Engine STATIC
         src/core/zobrist_hash.cpp
         src/core/attacks/rays_arrays.h
         src/core/attacks/attacks.cpp
-        src/core/attacks/bishop_attacks.cpp
-        src/core/attacks/rook_attacks.cpp
-        src/core/attacks/knight_attacks.cpp
-        src/core/attacks/king_attacks.cpp
-        src/core/attacks/pawn_attacks.cpp
+        src/core/attacks/bishop_attacks.h
+        src/core/attacks/rook_attacks.h
+        src/core/attacks/knight_attacks.h
+        src/core/attacks/king_attacks.h
+        src/core/attacks/pawn_attacks.h
         src/core/attacks/pin_mask.cpp
         src/core/move_gen.cpp
         src/core/perft.cpp

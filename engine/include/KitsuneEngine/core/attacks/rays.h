@@ -16,7 +16,7 @@ struct Rays {
 		}
 
 		[[nodiscard]]
-		static constexpr Bitboard GetXRay( const Square from, const Square to ) {
-			return RAYS[from * 64 + to];
+		static constexpr Bitboard GetXRay(const Square from, const Square to) {
+			return XRAYS[from * 64 + to];
 		}
 };

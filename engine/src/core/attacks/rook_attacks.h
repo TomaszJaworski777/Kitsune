@@ -1,21 +1,12 @@
-#include <iostream>
-
-#include "KitsuneEngine/core/attacks/attacks.h"
-
-#if PEXT
-#include <immintrin.h>
-#include "attack_arrays/rook_attacks_pext.h"
-#else
-#include "attack_arrays/rook_attacks.h"
-#endif
+#pragma once
 
 #if !PEXT
-static uint8_t ROOK_OCCUPANCY_COUNT[64]{
+static constexpr uint8_t ROOK_OCCUPANCY_COUNT[64]{
 	0xc, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xc, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xb, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa,
 	0xb, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xb, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xb, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa,
 	0xa, 0xb, 0xb, 0xa, 0xa, 0xa, 0xa, 0xa, 0xa, 0xb, 0xc, 0xb, 0xb, 0xb, 0xb, 0xb, 0xb, 0xc,
 };
-static uint64_t ROOK_MAGICS[64]{
+static constexpr uint64_t ROOK_MAGICS[64]{
 	0x8080002080104001, 0x340004120001000, 0x80200010008008, 0x2100100008210004, 0xf00048210480100, 0x100040002010008,
 	0x280008001000200, 0x100010000834422, 0x4900800030804000, 0x1320402010004000, 0xc000808010002000, 0x141001000082100,
 	0x1008800400080080, 0x818800400808200, 0x2000802000184, 0x820800080004100, 0x108000c000e00040, 0x90104000200040,
@@ -30,7 +21,7 @@ static uint64_t ROOK_MAGICS[64]{
 };
 #endif
 
-static uint64_t ROOK_MASKS[64]{
+static constexpr uint64_t ROOK_MASKS[64]{
 	0x101010101017e, 0x202020202027c, 0x404040404047a, 0x8080808080876, 0x1010101010106e, 0x2020202020205e,
 	0x4040404040403e, 0x8080808080807e, 0x1010101017e00, 0x2020202027c00, 0x4040404047a00, 0x8080808087600,
 	0x10101010106e00, 0x20202020205e00, 0x40404040403e00, 0x80808080807e00, 0x10101017e0100, 0x20202027c0200,
@@ -43,15 +34,3 @@ static uint64_t ROOK_MASKS[64]{
 	0x3e404040404000, 0x7e808080808000, 0x7e01010101010100, 0x7c02020202020200, 0x7a04040404040400, 0x7608080808080800,
 	0x6e10101010101000, 0x5e20202020202000, 0x3e40404040404000, 0x7e80808080808000,
 };
-
-Bitboard Attacks::GetRookAttacks( const Square square, const Bitboard occupancy ) {
-	const auto mask = ROOK_MASKS[square];
-#if !PEXT
-	const auto magic = ROOK_MAGICS[square];
-	const auto shift = 64 - ROOK_OCCUPANCY_COUNT[square];
-	const uint64_t index = ( ( occupancy & mask ) * magic ) >> shift;
-#else
-	const uint64_t index = _pext_u64(occupancy, mask);
-#endif
-	return ROOK_ATTACKS[square * 4096 + index];
-}

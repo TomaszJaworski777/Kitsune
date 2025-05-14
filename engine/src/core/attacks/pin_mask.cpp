@@ -1,7 +1,7 @@
 #include "KitsuneEngine/core/attacks/pin_mask.h"
 
 #include "KitsuneEngine/core/attacks/attacks.h"
-#include "KitsuneEngine/core/attacks/rays_arrays.h"
+#include "KitsuneEngine/core/attacks/rays.h"
 #include "KitsuneEngine/core/board.h"
 
 PinMask::PinMask( const Board &board, const SideToMove defenderSide ) {

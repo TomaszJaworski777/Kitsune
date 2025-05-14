@@ -1,6 +1,6 @@
-#include "KitsuneEngine/core/attacks/attacks.h"
+#pragma once
 
-static uint64_t KING_MOVES[64]{
+static constexpr uint64_t KING_MOVES[64]{
 	0x302, 0x705, 0xe0a, 0x1c14, 0x3828, 0x7050, 0xe0a0, 0xc040, 0x30203, 0x70507, 0xe0a0e, 0x1c141c, 0x382838,
 	0x705070, 0xe0a0e0, 0xc040c0, 0x3020300, 0x7050700, 0xe0a0e00, 0x1c141c00, 0x38283800, 0x70507000, 0xe0a0e000,
 	0xc040c000, 0x302030000, 0x705070000, 0xe0a0e0000, 0x1c141c0000, 0x3828380000, 0x7050700000, 0xe0a0e00000,
@@ -11,7 +11,3 @@ static uint64_t KING_MOVES[64]{
 	0xc040c00000000000, 0x203000000000000, 0x507000000000000, 0xa0e000000000000, 0x141c000000000000, 0x2838000000000000,
 	0x5070000000000000, 0xa0e0000000000000, 0x40c0000000000000,
 };
-
-Bitboard Attacks::GetKingAttacks( const Square square ) {
-	return KING_MOVES[square];
-}

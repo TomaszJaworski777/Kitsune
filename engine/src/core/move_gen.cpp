@@ -3,7 +3,7 @@
 #include "KitsuneEngine/core/board.h"
 #include "KitsuneEngine/core/attacks/attacks.h"
 #include "KitsuneEngine/core/attacks/pin_mask.h"
-#include "KitsuneEngine/core/attacks/rays_arrays.h"
+#include "KitsuneEngine/core/attacks/rays.h"
 
 MoveGenerator::MoveGenerator( const Board &board ) : m_Board( board ), m_Side( board.GetSideToMove() ),
                                                      m_OppositeSide( ~m_Side ),
