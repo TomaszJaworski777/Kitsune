@@ -3,7 +3,7 @@
 #include "KitsuneEngine/core/board.h"
 
 bool Attacks::IsInCheck( const Board &board ) {
-	return IsSquareAttacked( board, board.GetStmKingSquare(), board.GetSideToMove() );
+	return IsSquareAttacked( board, board.GetKingSquare( board.GetSideToMove() ), board.GetSideToMove() );
 }
 
 bool Attacks::IsSquareAttacked( const Board &board, const Square square, const SideToMove defenderSide ) {
@@ -16,7 +16,7 @@ bool Attacks::IsSquareAttackedWithOccupancy( const Board &board, const Square sq
 }
 
 Bitboard Attacks::GenerateCheckersMask( const Board &board ) {
-	return AllAttackersToSquare( board, board.GetStmKingSquare(), board.GetSideToMove(), board.GetOccupancy() );
+	return AllAttackersToSquare( board, board.GetKingSquare( board.GetSideToMove() ), board.GetSideToMove(), board.GetOccupancy() );
 }
 
 Bitboard Attacks::AllAttackersToSquare( const Board &board, const Square square, const SideToMove defenderSide,

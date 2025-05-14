@@ -15,12 +15,12 @@ struct PinMask {
 		PinMask( const Board &board, SideToMove defenderSide );
 
 		[[nodiscard]]
-		Bitboard GetOrthographicMask() const {
+		constexpr Bitboard GetOrthographicMask() const {
 			return m_OrthographicMask;
 		}
 
 		[[nodiscard]]
-		Bitboard GetDiagonalMask() const {
+		constexpr Bitboard GetDiagonalMask() const {
 			return m_DiagonalMask;
 		}
 };

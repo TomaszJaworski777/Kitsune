@@ -87,12 +87,6 @@ class Board {
 			return GetPieceMask( KING, stm ).Ls1bSquare();
 		}
 
-
-		[[nodiscard]]
-		constexpr Square GetStmKingSquare() const {
-			return GetPieceMask( KING, m_Side ).Ls1bSquare();
-		}
-
 		[[nodiscard]]
 		constexpr SideToMove GetPieceColorOnSquare( const Square square ) const {
 			if ( m_Occupancy[BLACK].GetBit( square ) )
