@@ -5,35 +5,38 @@
 #include "KitsuneEngine/core/board.h"
 
 PinMask::PinMask( const Board &board, const SideToMove defenderSide ) {
-	const auto kingSquare = board.GetKingSquare(defenderSide);
+	const auto kingSquare = board.GetKingSquare( defenderSide );
 	const auto attackerSide = ~defenderSide;
+	const auto generalOccupancy = board.GetOccupancy();
 	const auto defenderOccupancy = board.GetOccupancy( defenderSide );
 	const auto attackerOccupancy = board.GetOccupancy( attackerSide );
 
-	const auto queens = board.GetPieceMask( QUEEN, attackerSide );
+	const auto queens = board.GetPieceMask( QUEEN );
+	const auto diags = ( board.GetPieceMask( BISHOP ) | queens ) & attackerOccupancy;
+	const auto orthos = ( board.GetPieceMask( ROOK ) | queens ) & attackerOccupancy;
 
 	auto result = Bitboard::EMPTY;
 
-	auto potentialPinners = Attacks::GetBishopAttacks( kingSquare, attackerOccupancy ) & (
-		                        board.GetPieceMask( BISHOP, attackerSide ) | queens );
+	auto potentialPinners = Attacks::GetBishopAttacks( kingSquare, generalOccupancy );
+	potentialPinners = potentialPinners ^ Attacks::GetBishopAttacks(
+		                   kingSquare, generalOccupancy ^ potentialPinners & defenderOccupancy );
+	potentialPinners &= diags;
 
-	potentialPinners.Map( [defenderOccupancy, kingSquare, &result]( const Square square ) {
-		if ( const auto ray = Rays::GetRay( kingSquare, square ); ( ray & defenderOccupancy ).OnlyOneBit() ) {
-			result |= ray;
-		}
+	potentialPinners.Map( [kingSquare, &result]( const Square square ) {
+		result |= Rays::GetRay( kingSquare, square );
 	} );
 
 	m_DiagonalMask = result;
 
 	result = Bitboard::EMPTY;
 
-	potentialPinners = Attacks::GetRookAttacks( kingSquare, attackerOccupancy ) & (
-		                   board.GetPieceMask( ROOK, attackerSide ) | queens );
+	potentialPinners = Attacks::GetRookAttacks( kingSquare, generalOccupancy );
+	potentialPinners = potentialPinners ^ Attacks::GetRookAttacks(
+		                   kingSquare, generalOccupancy ^ potentialPinners & defenderOccupancy );
+	potentialPinners &= orthos;
 
-	potentialPinners.Map( [defenderOccupancy, kingSquare, &result]( const Square square ) {
-		if ( const auto ray = Rays::GetRay( kingSquare, square ); ( ray & defenderOccupancy ).OnlyOneBit() ) {
-			result |= ray;
-		}
+	potentialPinners.Map( [kingSquare, &result]( const Square square ) {
+		result |= Rays::GetRay( kingSquare, square );
 	} );
 
 	m_OrthographicMask = result;

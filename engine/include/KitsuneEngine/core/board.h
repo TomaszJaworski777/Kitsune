@@ -24,7 +24,7 @@ class Board {
 		Board( const FEN &fen );
 
 		[[nodiscard]]
-		uint64_t GetHash() const {
+		constexpr uint64_t GetHash() const {
 			ZobristHash result = m_Hash;
 
 			if ( m_enPassantSquare != Square( NULL_SQUARE ) ) {
@@ -38,70 +38,70 @@ class Board {
 		}
 
 		[[nodiscard]]
-		SideToMove GetSideToMove() const {
+		constexpr SideToMove GetSideToMove() const {
 			return m_Side;
 		}
 
 		[[nodiscard]]
-		bool CanCastle( const CastleRightsFlag flag ) const {
+		constexpr bool CanCastle( const CastleRightsFlag flag ) const {
 			return m_CastleRights & flag;
 		}
 
 		[[nodiscard]]
-		Square GetEnPassantSquare() const {
+		constexpr Square GetEnPassantSquare() const {
 			return m_enPassantSquare;
 		}
 
 		[[nodiscard]]
-		uint8_t GetHalfMoves() const {
+		constexpr uint8_t GetHalfMoves() const {
 			return m_HalfMoves;
 		}
 
 		[[nodiscard]]
-		Square GetPhase() const {
+		constexpr Square GetPhase() const {
 			return m_Phase;
 		}
 
 		[[nodiscard]]
-		Bitboard GetOccupancy( const SideToMove stm ) const {
+		constexpr Bitboard GetOccupancy( const SideToMove stm ) const {
 			return m_Occupancy[stm];
 		}
 
 		[[nodiscard]]
-		Bitboard GetOccupancy() const {
+		constexpr Bitboard GetOccupancy() const {
 			return m_Occupancy[0] | m_Occupancy[1];
 		}
 
 		[[nodiscard]]
-		Bitboard GetPieceMask( const PieceType piece ) const {
+		constexpr Bitboard GetPieceMask( const PieceType piece ) const {
 			return m_Pieces[piece];
 		}
 
 		[[nodiscard]]
-		Bitboard GetPieceMask( const PieceType piece, const SideToMove stm ) const {
+		constexpr Bitboard GetPieceMask( const PieceType piece, const SideToMove stm ) const {
 			return m_Occupancy[stm] & m_Pieces[piece];
 		}
 
 		[[nodiscard]]
-		Square GetKingSquare( const SideToMove stm ) const {
+		constexpr Square GetKingSquare( const SideToMove stm ) const {
 			return GetPieceMask( KING, stm ).Ls1bSquare();
 		}
 
 
 		[[nodiscard]]
-		Square GetStmKingSquare() const {
+		constexpr Square GetStmKingSquare() const {
 			return GetPieceMask( KING, m_Side ).Ls1bSquare();
 		}
 
 		[[nodiscard]]
-		SideToMove GetPieceColorOnSquare( const Square square ) const {
+		constexpr SideToMove GetPieceColorOnSquare( const Square square ) const {
 			if ( m_Occupancy[BLACK].GetBit( square ) )
 				return BLACK;
 			return WHITE;
 		}
 
 		[[nodiscard]]
-		PieceType GetPieceOnSquare( const Square square ) const {
+		constexpr PieceType GetPieceOnSquare( const Square square ) const {
 			//TODO: Test with mailbox
 			for ( int piece = PAWN; piece <= KING; piece++ ) {
 				if ( m_Pieces[piece].GetBit( square ) ) {
@@ -112,14 +112,14 @@ class Board {
 			return NULL_PIECE;
 		}
 
-		void SetPieceOnSquare( const Square square, const PieceType piece, const SideToMove pieceColor ) {
+		constexpr void SetPieceOnSquare( const Square square, const PieceType piece, const SideToMove pieceColor ) {
 			m_Occupancy[pieceColor].SetBit( square );
 			m_Pieces[piece].SetBit( square );
 			m_Hash.UpdatePieceHash( piece, pieceColor, square );
 			m_Phase += PHASE_VALUES[piece];
 		}
 
-		void RemovePieceOnSquare( const Square square, const PieceType piece, const SideToMove pieceColor ) {
+		constexpr void RemovePieceOnSquare( const Square square, const PieceType piece, const SideToMove pieceColor ) {
 			m_Occupancy[pieceColor].PopBit( square );
 			m_Pieces[piece].PopBit( square );
 			m_Hash.UpdatePieceHash( piece, pieceColor, square );

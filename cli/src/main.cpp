@@ -32,7 +32,7 @@ int main() {
 			std::chrono::high_resolution_clock::now() - t );
 		std::cout << "Result: " << result << std::endl;
 		std::cout << "Time: " << duration << std::endl;
-		std::cout << "Speed: " << (result * 1000 / duration.count()) << "nps" << std::endl << std::endl << std::endl;
+		std::cout << "Speed: " << ( result * 1000 / duration.count() ) << "nps" << std::endl << std::endl << std::endl;
 
 		t = std::chrono::high_resolution_clock::now();
 		result = Perft( board, 7, true, true, true );
@@ -40,7 +40,7 @@ int main() {
 			std::chrono::high_resolution_clock::now() - t );
 		std::cout << "Result: " << result << std::endl;
 		std::cout << "Time: " << duration << std::endl;
-		std::cout << "Speed: " << (result * 1000 / duration.count()) << "nps" << std::endl << std::endl << std::endl;
+		std::cout << "Speed: " << ( result * 1000 / duration.count() ) << "nps" << std::endl << std::endl << std::endl;
 	} );
 
 	thread.join();
