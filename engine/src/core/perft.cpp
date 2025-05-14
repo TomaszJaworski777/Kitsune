@@ -6,16 +6,15 @@
 #include "KitsuneEngine/core/board.h"
 #include "KitsuneEngine/core/move_gen.h"
 
-uint64_t Perft( const Board &board, uint8_t depth, bool bulk, bool printSplit, bool isFirst ) {
+uint64_t Perft( const Board &board, const uint8_t depth, const bool bulk, const bool printSplit, const bool isFirst ) {
 	if ( depth == 0 ) {
 		return 1;
 	}
 
-	Move moves[MAX_MOVES] {};
+	Move moves[MAX_MOVES]{ };
 	uint8_t movesCount = 0;
 	const auto moveGenerator = MoveGenerator( board );
-	movesCount = moveGenerator.GenerateNoisyMoves( moves );
-	movesCount += moveGenerator.GenerateQuietMoves( moves + movesCount );
+	movesCount = moveGenerator.GenerateMoves<MoveGenMode::ALL>( moves );
 
 	if ( depth == 1 && bulk ) {
 		return movesCount;
