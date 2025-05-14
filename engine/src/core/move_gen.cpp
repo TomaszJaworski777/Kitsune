@@ -16,37 +16,37 @@ MoveGenerator::MoveGenerator( const Board &board ) : m_Board( board ), m_Side( b
 	                                                     Attacks::GetKingAttacks( m_KingSquare ) & ~m_AttackMap ) {
 }
 
-Move* MoveGenerator::GetQuietKingMoves( Move *moves, const Bitboard moveMap, const Square kingSquare ) {
-	moveMap.Map( [&moves, kingSquare]( const Square square ) {
-		*( moves++ ) = Move( kingSquare, square, QUIET_MOVE_FLAG );
+Move* MoveGenerator::GetQuietKingMoves( Move *moves, const Bitboard moveMap ) const {
+	moveMap.Map( [&moves, this]( const Square square ) {
+		*( moves++ ) = Move( m_KingSquare, square, QUIET_MOVE_FLAG );
 	} );
 
 	return moves;
 }
 
-Move* MoveGenerator::GetNoisyKingMoves( Move *moves, const Bitboard moveMap, const Square kingSquare ) {
-	moveMap.Map( [&moves, kingSquare]( const Square square ) {
-		*( moves++ ) = Move( kingSquare, square, CAPTURE_FLAG );
+Move* MoveGenerator::GetNoisyKingMoves( Move *moves, const Bitboard moveMap ) const {
+	moveMap.Map( [&moves, this]( const Square square ) {
+		*( moves++ ) = Move( m_KingSquare, square, CAPTURE_FLAG );
 	} );
 
 	return moves;
 }
 
-Move* MoveGenerator::GetCastleMoves( Move *moves, const Board &board, const Bitboard attackMap, const SideToMove sideToMove ) {
-	if ( sideToMove == WHITE ) {
-		if ( board.CanCastle( CASTLE_WHITE_KING ) && !( 0x60 & attackMap ) && !( 0x60 & board.GetOccupancy() ) ) {
+Move* MoveGenerator::GetCastleMoves( Move *moves ) const {
+	if ( m_Side == WHITE ) {
+		if ( m_Board.CanCastle( CASTLE_WHITE_KING ) && !( 0x60 & m_AttackMap ) && !( 0x60 & m_Board.GetOccupancy() ) ) {
 			*( moves++ ) = Move( 4, 6, KING_SIDE_CASTLE_FLAG );
 		}
-		if ( board.CanCastle( CASTLE_WHITE_QUEEN ) && !( 0xC & attackMap ) && !( 0xE & board.GetOccupancy() ) ) {
+		if ( m_Board.CanCastle( CASTLE_WHITE_QUEEN ) && !( 0xC & m_AttackMap ) && !( 0xE & m_Board.GetOccupancy() ) ) {
 			*( moves++ ) = Move( 4, 2, QUEEN_SIDE_CASTLE_FLAG );
 		}
 	} else {
-		if ( board.CanCastle( CASTLE_BLACK_KING ) && !( 0x6000000000000000 & attackMap ) && !(
-			     0x6000000000000000 & board.GetOccupancy() ) ) {
+		if ( m_Board.CanCastle( CASTLE_BLACK_KING ) && !( 0x6000000000000000 & m_AttackMap ) && !(
+			     0x6000000000000000 & m_Board.GetOccupancy() ) ) {
 			*( moves++ ) = Move( 60, 62, KING_SIDE_CASTLE_FLAG );
 		}
-		if ( board.CanCastle( CASTLE_BLACK_QUEEN ) && !( 0xC00000000000000 & attackMap ) && !(
-			     0xE00000000000000 & board.GetOccupancy() ) ) {
+		if ( m_Board.CanCastle( CASTLE_BLACK_QUEEN ) && !( 0xC00000000000000 & m_AttackMap ) && !(
+			     0xE00000000000000 & m_Board.GetOccupancy() ) ) {
 			*( moves++ ) = Move( 60, 58, QUEEN_SIDE_CASTLE_FLAG );
 		}
 	}
@@ -54,30 +54,30 @@ Move* MoveGenerator::GetCastleMoves( Move *moves, const Board &board, const Bitb
 	return moves;
 }
 
-Move* MoveGenerator::GetQuietPawnMoves( Move *moves, const Board &board, const Bitboard pushMap, const Bitboard diagPins,
-                                        const Bitboard orthoPins, const SideToMove side ) {
+Move* MoveGenerator::GetQuietPawnMoves( Move *moves, const Bitboard pushMap, const Bitboard diagPins,
+                                        const Bitboard orthoPins ) const {
 	Bitboard verticalPin = orthoPins & ( orthoPins << 8 );
 	verticalPin |= orthoPins >> 8;
-	const Bitboard promotionRank = side == WHITE ? Bitboard::RANK_7 : Bitboard::RANK_2;
-	const Bitboard doublePushRank = side == WHITE ? Bitboard::RANK_2 : Bitboard::RANK_7;
-	const Bitboard pawnPool = board.GetPieceMask( PAWN, side ) & ~diagPins & ~promotionRank;
+	const Bitboard promotionRank = m_Side == WHITE ? Bitboard::RANK_7 : Bitboard::RANK_2;
+	const Bitboard doublePushRank = m_Side == WHITE ? Bitboard::RANK_2 : Bitboard::RANK_7;
+	const Bitboard pawnPool = m_Board.GetPieceMask( PAWN, m_Side ) & ~diagPins & ~promotionRank;
 	const Bitboard pinnedPawns = pawnPool & verticalPin;
 	const Bitboard movablePawns = ( pawnPool & ~orthoPins ) | pinnedPawns;
 	const Bitboard doublePushPawns = movablePawns & doublePushRank;
 
-	const Bitboard singlePushMap = side == WHITE ? pushMap >> 8 : pushMap << 8;
-	const Bitboard doublePushMap = side == WHITE ? pushMap >> 16 : pushMap << 16;
-	const Bitboard singlePushEmptyMap = side == WHITE ? ~board.GetOccupancy() >> 8 : ~board.GetOccupancy() << 8;
+	const Bitboard singlePushMap = m_Side == WHITE ? pushMap >> 8 : pushMap << 8;
+	const Bitboard doublePushMap = m_Side == WHITE ? pushMap >> 16 : pushMap << 16;
+	const Bitboard singlePushEmptyMap = m_Side == WHITE ? ~m_Board.GetOccupancy() >> 8 : ~m_Board.GetOccupancy() << 8;
 
 	Bitboard pawns = movablePawns & singlePushMap;
-	Bitboard targets = side == WHITE ? pawns << 8 : pawns >> 8;
+	Bitboard targets = m_Side == WHITE ? pawns << 8 : pawns >> 8;
 	auto a = Bitboard( pawns ), b = Bitboard( targets );
 	while ( a ) {
 		*( moves++ ) = Move( a.PopLs1bBit(), b.PopLs1bBit(), QUIET_MOVE_FLAG );
 	}
 
 	pawns = doublePushPawns & singlePushEmptyMap & doublePushMap;
-	targets = side == WHITE ? pawns << 16 : pawns >> 16;
+	targets = m_Side == WHITE ? pawns << 16 : pawns >> 16;
 	a = Bitboard( pawns ), b = Bitboard( targets );
 	while ( a ) {
 		*( moves++ ) = Move( a.PopLs1bBit(), b.PopLs1bBit(), DOUBLE_PUSH_FLAG );
@@ -86,23 +86,22 @@ Move* MoveGenerator::GetQuietPawnMoves( Move *moves, const Board &board, const B
 	return moves;
 }
 
-Move* MoveGenerator::GetNoisyPawnMoves( Move *moves, const Board &board, const Bitboard pushMap, const Bitboard captureMap,
-                                        const Bitboard diagPins, const Bitboard orthoPins, const SideToMove side,
-                                        const SideToMove oppositeSide, const Square kingSquare ) {
-	const Bitboard promotionRank = side == WHITE ? Bitboard::RANK_7 : Bitboard::RANK_2;
-	const Bitboard pawns = board.GetPieceMask( PAWN, side );
+Move* MoveGenerator::GetNoisyPawnMoves( Move *moves, const Bitboard pushMap, const Bitboard captureMap, const Bitboard diagPins,
+                                        const Bitboard orthoPins ) const {
+	const Bitboard promotionRank = m_Side == WHITE ? Bitboard::RANK_7 : Bitboard::RANK_2;
+	const Bitboard pawns = m_Board.GetPieceMask( PAWN, m_Side );
 	const Bitboard attackPawns = pawns & ~orthoPins;
 
-	uint8_t shift = side == WHITE ? 7 : 9;
+	uint8_t shift = m_Side == WHITE ? 7 : 9;
 	Bitboard leftPin = diagPins & ( diagPins << shift );
 	leftPin |= leftPin >> shift;
 
-	shift = side == WHITE ? 9 : 7;
+	shift = m_Side == WHITE ? 9 : 7;
 	Bitboard rightPin = diagPins & ( diagPins << shift );
 	rightPin |= rightPin >> shift;
 
-	const Bitboard leftShiftedCaptureMap = side == WHITE ? captureMap >> 7 : captureMap << 9;
-	const Bitboard rightShiftedCaptureMap = side == WHITE ? captureMap >> 9 : captureMap << 7;
+	const Bitboard leftShiftedCaptureMap = m_Side == WHITE ? captureMap >> 7 : captureMap << 9;
+	const Bitboard rightShiftedCaptureMap = m_Side == WHITE ? captureMap >> 9 : captureMap << 7;
 
 	const Bitboard leftAttackPawns = ( ( attackPawns & ~diagPins ) | ( attackPawns & leftPin ) ) & ~Bitboard::FILE_A;
 	const Bitboard rightAttackPawns = ( ( attackPawns & ~diagPins ) | ( attackPawns & rightPin ) ) & ~Bitboard::FILE_H;
@@ -111,21 +110,21 @@ Move* MoveGenerator::GetNoisyPawnMoves( Move *moves, const Board &board, const B
 	const Bitboard rightPromotionPawns = rightAttackPawns & promotionRank;
 
 	Bitboard capturePawns = leftAttackPawns & ~leftPromotionPawns & leftShiftedCaptureMap;
-	Bitboard targets = side == WHITE ? capturePawns << 7 : capturePawns >> 9;
+	Bitboard targets = m_Side == WHITE ? capturePawns << 7 : capturePawns >> 9;
 	auto a = Bitboard( capturePawns ), b = Bitboard( targets );
 	while ( a ) {
 		*( moves++ ) = Move( a.PopLs1bBit(), b.PopLs1bBit(), CAPTURE_FLAG );
 	}
 
 	capturePawns = rightAttackPawns & ~rightPromotionPawns & rightShiftedCaptureMap;
-	targets = side == WHITE ? capturePawns << 9 : capturePawns >> 7;
+	targets = m_Side == WHITE ? capturePawns << 9 : capturePawns >> 7;
 	a = Bitboard( capturePawns ), b = Bitboard( targets );
 	while ( a ) {
 		*( moves++ ) = Move( a.PopLs1bBit(), b.PopLs1bBit(), CAPTURE_FLAG );
 	}
 
 	capturePawns = leftPromotionPawns & leftShiftedCaptureMap;
-	targets = side == WHITE ? capturePawns << 7 : capturePawns >> 9;
+	targets = m_Side == WHITE ? capturePawns << 7 : capturePawns >> 9;
 	a = Bitboard( capturePawns ), b = Bitboard( targets );
 	while ( a ) {
 		const Square from = a.PopLs1bBit(), to = b.PopLs1bBit();
@@ -136,7 +135,7 @@ Move* MoveGenerator::GetNoisyPawnMoves( Move *moves, const Board &board, const B
 	}
 
 	capturePawns = rightPromotionPawns & rightShiftedCaptureMap;
-	targets = side == WHITE ? capturePawns << 9 : capturePawns >> 7;
+	targets = m_Side == WHITE ? capturePawns << 9 : capturePawns >> 7;
 	a = Bitboard( capturePawns ), b = Bitboard( targets );
 	while ( a ) {
 		const Square from = a.PopLs1bBit(), to = b.PopLs1bBit();
@@ -147,8 +146,8 @@ Move* MoveGenerator::GetNoisyPawnMoves( Move *moves, const Board &board, const B
 	}
 
 	Bitboard promotionPawns = pawns & promotionRank & ~diagPins;
-	targets = ( side == WHITE ? promotionPawns << 8 : promotionPawns >> 8 ) & pushMap;
-	promotionPawns = side == WHITE ? targets >> 8 : targets << 8;
+	targets = ( m_Side == WHITE ? promotionPawns << 8 : promotionPawns >> 8 ) & pushMap;
+	promotionPawns = m_Side == WHITE ? targets >> 8 : targets << 8;
 	a = Bitboard( promotionPawns ), b = Bitboard( targets );
 	while ( a ) {
 		const Square from = a.PopLs1bBit(), to = b.PopLs1bBit();
@@ -158,17 +157,17 @@ Move* MoveGenerator::GetNoisyPawnMoves( Move *moves, const Board &board, const B
 		*( moves++ ) = Move( from, to, QUEEN_PROMOTION_FLAG );
 	}
 
-	const Square enPassantSquare = board.GetEnPassantSquare();
+	const Square enPassantSquare = m_Board.GetEnPassantSquare();
 	if ( enPassantSquare == NULL_SQUARE )
 		return moves;
 
-	const Bitboard enPassantPawns = Attacks::GetPawnAttacks( enPassantSquare, oppositeSide ) & attackPawns;
-	enPassantPawns.Map( [&moves, &board, enPassantSquare, kingSquare, side]( const Square square ) {
-		Board temp = board;
+	const Bitboard enPassantPawns = Attacks::GetPawnAttacks( enPassantSquare, m_OppositeSide ) & attackPawns;
+	enPassantPawns.Map( [&moves, enPassantSquare, this]( const Square square ) {
+		Board temp = m_Board;
 		const auto move = Move( square, enPassantSquare, EN_PASSANT_FLAG );
 		temp.MakeMove( move );
 
-		if ( !Attacks::IsSquareAttacked( temp, kingSquare, side ) ) {
+		if ( !Attacks::IsSquareAttacked( temp, m_KingSquare, m_Side ) ) {
 			*( moves++ ) = move;
 		}
 	} );
@@ -176,19 +175,18 @@ Move* MoveGenerator::GetNoisyPawnMoves( Move *moves, const Board &board, const B
 	return moves;
 }
 
-Move* MoveGenerator::GetPieceMoves( Move *moves, const Board &board, const PieceType piece, const Bitboard moveMap,
-                                    const Bitboard diagPins, const Bitboard orthoPins, const MoveFlag flag,
-                                    const SideToMove side ) {
+Move* MoveGenerator::GetPieceMoves( Move *moves, const PieceType piece, const Bitboard moveMap,
+                                    const Bitboard diagPins, const Bitboard orthoPins, const MoveFlag flag ) const {
 	Bitboard pieces = Bitboard::EMPTY;
 	switch ( piece ) {
 		case KNIGHT:
-			pieces = board.GetPieceMask( KNIGHT, side ) & ~diagPins & ~orthoPins;
+			pieces = m_Board.GetPieceMask( KNIGHT, m_Side ) & ~diagPins & ~orthoPins;
 			break;
 		case BISHOP:
-			pieces = ( board.GetPieceMask( BISHOP, side ) | board.GetPieceMask( QUEEN, side ) ) & ~orthoPins;
+			pieces = ( m_Board.GetPieceMask( BISHOP, m_Side ) | m_Board.GetPieceMask( QUEEN, m_Side ) ) & ~orthoPins;
 			break;
 		case ROOK:
-			pieces = ( board.GetPieceMask( ROOK, side ) | board.GetPieceMask( QUEEN, side ) ) & ~diagPins;
+			pieces = ( m_Board.GetPieceMask( ROOK, m_Side ) | m_Board.GetPieceMask( QUEEN, m_Side ) ) & ~diagPins;
 			break;
 		default: break;
 	}
@@ -206,14 +204,14 @@ Move* MoveGenerator::GetPieceMoves( Move *moves, const Board &board, const Piece
 
 	const Bitboard nonPinnedPieces = pieces & ~pinnedPieces;
 
-	nonPinnedPieces.Map( [&moves, &board, piece, moveMap, flag]( const Square fromSquare ) {
+	nonPinnedPieces.Map( [&moves, piece, moveMap, flag, this]( const Square fromSquare ) {
 		Bitboard attacks = Bitboard::EMPTY;
 		switch ( piece ) {
 			case KNIGHT: attacks = Attacks::GetKnightAttacks( fromSquare );
 				break;
-			case BISHOP: attacks = Attacks::GetBishopAttacks( fromSquare, board.GetOccupancy() );
+			case BISHOP: attacks = Attacks::GetBishopAttacks( fromSquare, m_Board.GetOccupancy() );
 				break;
-			case ROOK: attacks = Attacks::GetRookAttacks( fromSquare, board.GetOccupancy() );
+			case ROOK: attacks = Attacks::GetRookAttacks( fromSquare, m_Board.GetOccupancy() );
 				break;
 			default: break;
 		}
@@ -223,12 +221,12 @@ Move* MoveGenerator::GetPieceMoves( Move *moves, const Board &board, const Piece
 		} );
 	} );
 
-	pinnedPieces.Map( [&moves, &board, piece, moveMap, diagPins, orthoPins, flag]( const Square fromSquare ) {
+	pinnedPieces.Map( [&moves, piece, moveMap, diagPins, orthoPins, flag, this]( const Square fromSquare ) {
 		Bitboard attacks = Bitboard::EMPTY;
 		switch ( piece ) {
-			case BISHOP: attacks = Attacks::GetBishopAttacks( fromSquare, board.GetOccupancy() ) & diagPins;
+			case BISHOP: attacks = Attacks::GetBishopAttacks( fromSquare, m_Board.GetOccupancy() ) & diagPins;
 				break;
-			case ROOK: attacks = Attacks::GetRookAttacks( fromSquare, board.GetOccupancy() ) & orthoPins;
+			case ROOK: attacks = Attacks::GetRookAttacks( fromSquare, m_Board.GetOccupancy() ) & orthoPins;
 				break;
 			default: break;
 		}

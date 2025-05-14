@@ -37,69 +37,66 @@ struct MoveGenerator {
 			const auto flippedOccupancy = ~m_Board.GetOccupancy();
 
 			if constexpr ( MODE & MoveGenMode::QUIET ) {
-				moves = GetQuietKingMoves( moves, m_KingMoveMap & flippedOccupancy, m_KingSquare );
+				moves = GetQuietKingMoves( moves, m_KingMoveMap & flippedOccupancy );
 			}
 
 			if constexpr ( MODE & MoveGenMode::NOISY ) {
-				moves = GetNoisyKingMoves( moves, m_KingMoveMap & captureMap, m_KingSquare );
+				moves = GetNoisyKingMoves( moves, m_KingMoveMap & captureMap );
 			}
 
 			if ( !m_Checkers ) {
 				if constexpr ( MODE & MoveGenMode::QUIET ) {
-					moves = GetCastleMoves( moves, m_Board, m_AttackMap, m_Side );
+					moves = GetCastleMoves( moves );
 				}
 
 				const auto pushMap = ~m_Board.GetOccupancy();
 
 				if constexpr ( MODE & MoveGenMode::QUIET ) {
-					moves = GetQuietPawnMoves( moves, m_Board, pushMap, diagPins, orthoPins, m_Side );
-					moves = GetPieceMoves( moves, m_Board, KNIGHT, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG, m_Side );
-					moves = GetPieceMoves( moves, m_Board, BISHOP, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG, m_Side );
-					moves = GetPieceMoves( moves, m_Board, ROOK, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG, m_Side );
+					moves = GetQuietPawnMoves( moves, pushMap, diagPins, orthoPins );
+					moves = GetPieceMoves( moves, KNIGHT, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG );
+					moves = GetPieceMoves( moves, BISHOP, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG );
+					moves = GetPieceMoves( moves, ROOK, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG );
 				}
 
 				if constexpr ( MODE & MoveGenMode::NOISY ) {
-					moves = GetNoisyPawnMoves( moves, m_Board, pushMap, captureMap, diagPins, orthoPins, m_Side, m_OppositeSide,
-					                           m_KingSquare );
-					moves = GetPieceMoves( moves, m_Board, KNIGHT, captureMap, diagPins, orthoPins, CAPTURE_FLAG, m_Side );
-					moves = GetPieceMoves( moves, m_Board, BISHOP, captureMap, diagPins, orthoPins, CAPTURE_FLAG, m_Side );
-					moves = GetPieceMoves( moves, m_Board, ROOK, captureMap, diagPins, orthoPins, CAPTURE_FLAG, m_Side );
+					moves = GetNoisyPawnMoves( moves, pushMap, captureMap, diagPins, orthoPins );
+					moves = GetPieceMoves( moves, KNIGHT, captureMap, diagPins, orthoPins, CAPTURE_FLAG );
+					moves = GetPieceMoves( moves, BISHOP, captureMap, diagPins, orthoPins, CAPTURE_FLAG );
+					moves = GetPieceMoves( moves, ROOK, captureMap, diagPins, orthoPins, CAPTURE_FLAG );
 				}
 			} else if ( !( m_Checkers & ( m_Checkers - 1 ) ) ) {
 				const auto checker = m_Checkers.Ls1bSquare();
 				const auto pushMap = Rays::GetRayExcludeDestination( m_KingSquare, checker );
 
 				if constexpr ( MODE & MoveGenMode::QUIET ) {
-					moves = GetQuietPawnMoves( moves, m_Board, pushMap, diagPins, orthoPins, m_Side );
-					moves = GetPieceMoves( moves, m_Board, KNIGHT, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG, m_Side );
-					moves = GetPieceMoves( moves, m_Board, BISHOP, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG, m_Side );
-					moves = GetPieceMoves( moves, m_Board, ROOK, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG, m_Side );
+					moves = GetQuietPawnMoves( moves, pushMap, diagPins, orthoPins );
+					moves = GetPieceMoves( moves, KNIGHT, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG );
+					moves = GetPieceMoves( moves, BISHOP, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG );
+					moves = GetPieceMoves( moves, ROOK, pushMap, diagPins, orthoPins, QUIET_MOVE_FLAG );
 				}
 
 				if constexpr ( MODE & MoveGenMode::NOISY ) {
-					moves = GetNoisyPawnMoves( moves, m_Board, pushMap, m_Checkers, diagPins, orthoPins, m_Side, m_OppositeSide,
-					                           m_KingSquare );
-					moves = GetPieceMoves( moves, m_Board, KNIGHT, m_Checkers, diagPins, orthoPins, CAPTURE_FLAG, m_Side );
-					moves = GetPieceMoves( moves, m_Board, BISHOP, m_Checkers, diagPins, orthoPins, CAPTURE_FLAG, m_Side );
-					moves = GetPieceMoves( moves, m_Board, ROOK, m_Checkers, diagPins, orthoPins, CAPTURE_FLAG, m_Side );
+					moves = GetNoisyPawnMoves( moves, pushMap, m_Checkers, diagPins, orthoPins );
+					moves = GetPieceMoves( moves, KNIGHT, m_Checkers, diagPins, orthoPins, CAPTURE_FLAG );
+					moves = GetPieceMoves( moves, BISHOP, m_Checkers, diagPins, orthoPins, CAPTURE_FLAG );
+					moves = GetPieceMoves( moves, ROOK, m_Checkers, diagPins, orthoPins, CAPTURE_FLAG );
 				}
 			}
 
 			return static_cast<uint8_t>(moves - start);
 		}
 
-		static Move* GetQuietKingMoves( Move *moves, Bitboard moveMap, Square kingSquare );
+		Move* GetQuietKingMoves( Move *moves, Bitboard moveMap ) const;
 
-		static Move* GetNoisyKingMoves( Move *moves, Bitboard moveMap, Square kingSquare );
+		Move* GetNoisyKingMoves( Move *moves, Bitboard moveMap ) const;
 
-		static Move* GetCastleMoves( Move *moves, const Board &board, Bitboard attackMap, SideToMove sideToMove );
+		Move* GetCastleMoves( Move *moves ) const;
 
-		static Move* GetQuietPawnMoves( Move *moves, const Board &board, Bitboard pushMap, Bitboard diagPins, Bitboard orthoPins,
-		                                SideToMove side );
+		Move* GetQuietPawnMoves( Move *moves, Bitboard pushMap, Bitboard diagPins, Bitboard orthoPins ) const;
 
-		static Move* GetNoisyPawnMoves( Move *moves, const Board &board, Bitboard pushMap, Bitboard captureMap, Bitboard diagPins,
-		                                Bitboard orthoPins, SideToMove side, SideToMove oppositeSide, Square kingSquare );
+		Move* GetNoisyPawnMoves( Move *moves, Bitboard pushMap, Bitboard captureMap, Bitboard diagPins,
+		                         Bitboard orthoPins ) const;
 
-		static Move* GetPieceMoves( Move *moves, const Board &board, PieceType piece, Bitboard moveMap, Bitboard diagPins,
-		                            Bitboard orthoPins, MoveFlag flag, SideToMove side );
+		Move* GetPieceMoves( Move *moves, PieceType piece, Bitboard moveMap, Bitboard diagPins,
+		                     Bitboard orthoPins, MoveFlag flag ) const;
 };
