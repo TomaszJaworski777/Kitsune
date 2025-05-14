@@ -180,6 +180,7 @@ void Board::MakeMove( const Move &move, const CastleRules &castleRules ) {
 	const MoveFlag moveFlag = move.GetFlag();
 	const bool isPromotion = move.IsPromotion();
 	const bool isCapture = move.IsCapture();
+	const bool isCastle = move.IsCastle();
 	const SideToMove oppositeSideToMove = ~m_Side;
 	const PieceType movedPiece = GetPieceOnSquare( fromSquare );
 	const PieceType capturedPiece = GetPieceOnSquare( toSquare );
@@ -189,7 +190,7 @@ void Board::MakeMove( const Move &move, const CastleRules &castleRules ) {
 	}
 
 	RemovePieceOnSquare( fromSquare, movedPiece, m_Side );
-	if ( !isPromotion ) {
+	if ( !isPromotion && !isCastle ) {
 		SetPieceOnSquare( toSquare, movedPiece, m_Side );
 	}
 
@@ -210,10 +211,12 @@ void Board::MakeMove( const Move &move, const CastleRules &castleRules ) {
 		case QUEEN_SIDE_CASTLE_FLAG:
 			RemovePieceOnSquare( sideFlip, ROOK, m_Side );
 			SetPieceOnSquare( sideFlip + 3, ROOK, m_Side );
+			SetPieceOnSquare( sideFlip + 2, KING, m_Side );
 			break;
 		case KING_SIDE_CASTLE_FLAG:
 			RemovePieceOnSquare( sideFlip + 7, ROOK, m_Side );
 			SetPieceOnSquare( sideFlip + 5, ROOK, m_Side );
+			SetPieceOnSquare( sideFlip + 6, KING, m_Side );
 			break;
 		case EN_PASSANT_FLAG:
 			RemovePieceOnSquare( toSquare ^ 8, PAWN, oppositeSideToMove );

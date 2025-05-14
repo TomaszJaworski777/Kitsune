@@ -27,10 +27,6 @@ int main() {
 
 	const auto castleRules = board.GetCastleRules();
 
-	for ( int x = 0; x < 64; x++ ) {
-		std::cout << static_cast<uint32_t>(CASTLE_MASK[x]) << " --> " << static_cast<uint32_t>(castleRules.GetMask( x )) << std::endl;
-	}
-
 	auto thread = std::jthread( [&board, &castleRules]( std::stop_token token ) {
 		auto t = std::chrono::high_resolution_clock::now();
 		uint64_t result = Perft( board, castleRules, 6, false, true, true );
