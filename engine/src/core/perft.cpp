@@ -32,7 +32,7 @@ uint64_t Perft( const Board &board, const CastleRules &castleRules, const uint8_
 		result += split;
 
 		if ( printSplit && isFirst ) {
-			printf( std::format( "{} - {}\n", move.ToString(), split ).c_str() );
+			printf( std::format( "{} - {}\n", move.ToString( board.GetChess960() ), split ).c_str() );
 		}
 	}
 

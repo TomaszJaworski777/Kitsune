@@ -29,6 +29,8 @@ Board::Board() {
 	m_HalfMoves = 0;
 	m_Phase = 24;
 
+	m_Chess960 = false;
+
 	m_Hash = 0x325BF1EB13D84627;
 }
 
@@ -94,6 +96,8 @@ Board::Board( const FEN &fen ) {
 		m_enPassantSquare = Square( fen.GetEnPassantSquare() );
 	}
 
+	m_Chess960 = false;
+
 	m_HalfMoves = std::stoi( fen.GetHalfMoveCounter() );
 }
 
@@ -138,13 +142,13 @@ std::string Board::ToString() const {
 
 	std::string info[8]{
 		std::format( "FEN: TBD" ),
+		std::format( "Chess960: {}", GetChess960() ),
 		std::format( "Zobrist Hash: {:#x}", GetHash() ),
 		std::format( "Castle Rights: {}", castleRights ),
 		std::format( "Side To Move: {}", stm ),
 		std::format( "En Passant: {}", GetEnPassantSquare().ToString() ),
 		std::format( "Half Moves: {}", m_HalfMoves ),
 		std::format( "Phase: {}", static_cast<int>(m_Phase) ),
-		std::format( "Insufficient Material: {}", IsInsufficientMaterial() ),
 	};
 
 	result += " -----------------\n";

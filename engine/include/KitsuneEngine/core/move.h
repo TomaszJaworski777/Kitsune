@@ -62,7 +62,7 @@ struct Move {
 		}
 
 		[[nodiscard]]
-		std::string ToString() const;
+		std::string ToString( bool chess960 ) const;
 
 		constexpr operator uint16_t() const {
 			return m_Value;

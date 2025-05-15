@@ -88,30 +88,30 @@ struct MoveGenerator {
 		template<SideToMove SIDE>
 		Move* GetCastleMoves( Move *moves ) const {
 			if constexpr ( SIDE == WHITE ) {
+				auto rookSquare = m_CastleRules.GetRookSquare( 1 );
 				if ( m_Board.CanCastle( CASTLE_WHITE_KING )
 				     && !( Rays::GetRay( m_KingSquare, 6 ) & m_AttackMap )
-				     && !( Rays::GetRayExcludeDestination( m_KingSquare, m_CastleRules.GetRookSquare( 1 ) ) & m_Board.
-				           GetOccupancy() ) ) {
-					*( moves++ ) = Move( m_KingSquare, 6, KING_SIDE_CASTLE_FLAG );
+				     && !( Rays::GetRayExcludeDestination( m_KingSquare, rookSquare ) & m_Board.GetOccupancy() ) ) {
+					*( moves++ ) = Move( m_KingSquare, rookSquare, KING_SIDE_CASTLE_FLAG );
 				}
+				rookSquare = m_CastleRules.GetRookSquare( 0 );
 				if ( m_Board.CanCastle( CASTLE_WHITE_QUEEN )
 				     && !( Rays::GetRay( m_KingSquare, 2 ) & m_AttackMap )
-				     && !( Rays::GetRayExcludeDestination( m_KingSquare, m_CastleRules.GetRookSquare( 0 ) ) & m_Board.
-				           GetOccupancy() ) ) {
-					*( moves++ ) = Move( m_KingSquare, 2, QUEEN_SIDE_CASTLE_FLAG );
+				     && !( Rays::GetRayExcludeDestination( m_KingSquare, rookSquare ) & m_Board.GetOccupancy() ) ) {
+					*( moves++ ) = Move( m_KingSquare, rookSquare, QUEEN_SIDE_CASTLE_FLAG );
 				}
 			} else {
+				auto rookSquare = m_CastleRules.GetRookSquare( 3 );
 				if ( m_Board.CanCastle( CASTLE_BLACK_KING )
 				     && !( Rays::GetRay( m_KingSquare, 62 ) & m_AttackMap )
-				     && !( Rays::GetRayExcludeDestination( m_KingSquare, m_CastleRules.GetRookSquare( 3 ) ) & m_Board.
-				           GetOccupancy() ) ) {
-					*( moves++ ) = Move( m_KingSquare, 62, KING_SIDE_CASTLE_FLAG );
+				     && !( Rays::GetRayExcludeDestination( m_KingSquare,rookSquare ) & m_Board.GetOccupancy() ) ) {
+					*( moves++ ) = Move( m_KingSquare, rookSquare, KING_SIDE_CASTLE_FLAG );
 				}
+				rookSquare = m_CastleRules.GetRookSquare( 2 );
 				if ( m_Board.CanCastle( CASTLE_BLACK_QUEEN )
 				     && !( Rays::GetRay( m_KingSquare, 58 ) & m_AttackMap )
-				     && !( Rays::GetRayExcludeDestination( m_KingSquare, m_CastleRules.GetRookSquare( 2 ) ) & m_Board.
-				           GetOccupancy() ) ) {
-					*( moves++ ) = Move( m_KingSquare, 58, QUEEN_SIDE_CASTLE_FLAG );
+				     && !( Rays::GetRayExcludeDestination( m_KingSquare, rookSquare ) & m_Board.GetOccupancy() ) ) {
+					*( moves++ ) = Move( m_KingSquare, rookSquare, QUEEN_SIDE_CASTLE_FLAG );
 				}
 			}
 

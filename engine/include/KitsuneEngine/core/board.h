@@ -18,6 +18,7 @@ class Board {
 		Square m_enPassantSquare;
 		uint8_t m_HalfMoves;
 		uint8_t m_Phase;
+		bool m_Chess960;
 
 	public:
 		Board();
@@ -60,8 +61,12 @@ class Board {
 
 		[[nodiscard]]
 		constexpr Square GetPhase() const {
-			;
 			return m_Phase;
+		}
+
+		[[nodiscard]]
+		constexpr bool GetChess960() const {
+			return m_Chess960;
 		}
 
 		[[nodiscard]]
