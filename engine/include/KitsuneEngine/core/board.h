@@ -139,6 +139,9 @@ class Board {
 		[[nodiscard]]
 		std::string ToString() const;
 
+		[[nodiscard]]
+		std::string ToFEN() const;
+
 		constexpr void MakeMove( const Move &move, const CastleRules &castleRules ) {
 			if ( m_Side == WHITE ) {
 				MakeMove_Side<WHITE>( move, castleRules );

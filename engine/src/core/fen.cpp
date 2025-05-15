@@ -3,6 +3,7 @@
 #include <format>
 #include <sstream>
 
+#include "KitsuneEngine/types.h"
 #include "KitsuneEngine/core/square.h"
 
 FEN::FEN( const std::string &str ) {
@@ -14,7 +15,33 @@ FEN::FEN( const std::string &str ) {
 	}
 
 	m_SideToMove = fenSplit[1];
-	m_CastleRights = fenSplit[2];
+
+	std::string castleRights = fenSplit[2];
+	const bool normalOrX = fenSplit[2] == "-" || fenSplit[2].contains( 'K' )
+	                       || fenSplit[2].contains( 'Q' )
+	                       || fenSplit[2].contains( 'k' )
+	                       || fenSplit[2].contains( 'q' );
+
+	if ( !normalOrX ) {
+		std::string results = "";
+		for ( int i = 0; i < castleRights.length(); i++ ) {
+			const uint8_t fileChar = castleRights[i];
+			const SideToMove side = fileChar < 97 ? WHITE : BLACK;
+			const uint8_t kingFile = positionParts[( 1 - side ) * 7].find( side == WHITE ? 'K' : 'k' );
+			if ( std::tolower( castleRights[i] ) - 'a' < kingFile ) {
+				results += side == WHITE ? 'Q' : 'q';
+			} else {
+				results += side == WHITE ? 'K' : 'k';
+			}
+		}
+
+		m_Chess960 = true;
+		m_CastleRights = results;
+	} else {
+		m_Chess960 = false;
+		m_CastleRights = castleRights;
+	}
+
 	m_EnPassantSquare = fenSplit[3];
 
 	if ( fenSplit.size() > 4 ) {
@@ -43,19 +70,6 @@ bool FEN::IsFenValid( const std::string &str ) {
 	}
 
 	if ( fenSplit[1] != "w" && fenSplit[1] != "b" ) {
-		return false;
-	}
-
-	if ( fenSplit[2].size() == 1 && fenSplit[2] != "-" ) {
-		return false;
-	}
-
-	const bool correctCastleRights = fenSplit[2].contains( 'K' )
-	                                 || fenSplit[2].contains( 'Q' )
-	                                 || fenSplit[2].contains( 'k' )
-	                                 || fenSplit[2].contains( 'q' );
-
-	if ( fenSplit[2].size() > 4 || !correctCastleRights ) {
 		return false;
 	}
 
@@ -117,4 +131,3 @@ std::vector<std::string> FEN::Split( const std::string &str, const char delimite
 	tokens.push_back( str.substr( start ) );
 	return tokens;
 }
-

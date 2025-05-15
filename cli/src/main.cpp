@@ -22,7 +22,10 @@ int main() {
 	infos[16] = "   draw";
 	std::cout << "\n" << GetASCIILogo( infos ) << std::endl << std::endl;
 
-	auto board = Board( FEN( "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" ) );
+	const auto fen = FEN( "b1q1rrkb/pppppppp/3nn3/8/P7/1PPP4/4PPPP/BQNNRKRB w GE - 1 9" );
+	std::cout << fen.ToString() << std::endl;
+
+	auto board = Board( fen );
 	std::cout << board.ToString() << std::endl;
 
 	const auto castleRules = board.GetCastleRules();

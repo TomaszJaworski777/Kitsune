@@ -65,6 +65,8 @@ Board::Board( const FEN &fen ) {
 		}
 	}
 
+	m_Chess960 = fen.IsChess960();
+
 	if ( fen.GetSideToMove() == "w" ) {
 		m_Side = WHITE;
 	} else {
@@ -95,8 +97,6 @@ Board::Board( const FEN &fen ) {
 	if ( fen.GetEnPassantSquare() != "-" ) {
 		m_enPassantSquare = Square( fen.GetEnPassantSquare() );
 	}
-
-	m_Chess960 = false;
 
 	m_HalfMoves = std::stoi( fen.GetHalfMoveCounter() );
 }
@@ -141,7 +141,7 @@ std::string Board::ToString() const {
 	}
 
 	std::string info[8]{
-		std::format( "FEN: TBD" ),
+		std::format( "FEN: {}", ToFEN() ),
 		std::format( "Chess960: {}", GetChess960() ),
 		std::format( "Zobrist Hash: {:#x}", GetHash() ),
 		std::format( "Castle Rights: {}", castleRights ),
@@ -176,4 +176,8 @@ std::string Board::ToString() const {
 
 	result += " -----------------\n";
 	return result;
+}
+
+std::string Board::ToFEN() const {
+	return "";
 }
