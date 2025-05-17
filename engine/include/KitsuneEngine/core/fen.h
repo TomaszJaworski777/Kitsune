@@ -64,4 +64,6 @@ struct FEN {
 	private:
 		[[nodiscard]]
 		static std::vector<std::string> Split( const std::string &str, char delimiter );
+		[[nodiscard]]
+		std::string NormalizeCastleRights( const std::vector<std::string> &position, const std::string &rights );
 };
