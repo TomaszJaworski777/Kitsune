@@ -33,6 +33,6 @@ target_compile_options(Kitsune-Engine
         /QIntel-jcc-erratum # Enables performance mitigations for Intel JCC erratum microcode update
         /Gw                 # Enables packaging of global data in COMDAT sections
         /GA                 # Enables generation of more optimal code for TLS storage access
-        /EHs-c-             # Disables exceptions
-        /GR-                # Disables RTTI
+#        /EHs-c-             # Disables exceptions
+#        /GR-                # Disables RTTI
 )

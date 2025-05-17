@@ -15,19 +15,17 @@ struct CastleRules {
 			whiteRooks.Map( [this, whiteKingSquare]( const Square rookSquare ) {
 				const uint8_t index = rookSquare < whiteKingSquare ? 0 : 1;
 				m_Rooks[index] = rookSquare;
+				m_Mask[m_Rooks[index]] = 0b1000 >> index;
 			} );
 
 			blackRooks.Map( [this, blackKingSquare]( const Square rookSquare ) {
 				const uint8_t index = rookSquare < blackKingSquare ? 0 : 1;
 				m_Rooks[2 + index] = rookSquare;
+				m_Mask[m_Rooks[2 + index]] = 0b0010 >> index;
 			} );
 
-			m_Mask[m_Rooks[0]] = 0b1000;
 			m_Mask[whiteKingSquare] = 0b1100;
-			m_Mask[m_Rooks[1]] = 0b0100;
-			m_Mask[m_Rooks[2]] = 0b0010;
 			m_Mask[blackKingSquare] = 0b0011;
-			m_Mask[m_Rooks[3]] = 0b0001;
 		}
 
 		[[nodiscard]]
