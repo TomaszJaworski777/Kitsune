@@ -2,6 +2,7 @@
 
 #include <format>
 #include <sstream>
+#include <algorithm>
 
 #include "KitsuneEngine/core/square.h"
 
@@ -112,8 +113,8 @@ std::string FEN::NormalizeCastleRights(
 	const std::string &rights
 ) {
 	auto findFiles = []( const std::string &fenRank, const char target ) {
-		std::vector<std::size_t> files;
-		std::size_t file = 0;
+		std::vector<uint8_t> files;
+		uint8_t file = 0;
 		for ( const char character: fenRank ) {
 			if ( std::isdigit( character ) ) {
 				file += character - '0';
@@ -126,8 +127,8 @@ std::string FEN::NormalizeCastleRights(
 		return files;
 	};
 
-	const std::size_t whiteKingFile = findFiles( position[7], 'K' )[0];
-	const std::size_t blackKingFile = findFiles( position[0], 'k' )[0];
+	const uint8_t whiteKingFile = findFiles( position[7], 'K' )[0];
+	const uint8_t blackKingFile = findFiles( position[0], 'k' )[0];
 
 	const auto whiteRooks = findFiles( position[7], 'R' );
 	const auto blackRooks = findFiles( position[0], 'r' );
@@ -141,30 +142,28 @@ std::string FEN::NormalizeCastleRights(
 	std::string result;
 	result.reserve( rights.size() );
 
-	return rights;
-
 	for ( const char character: rights ) {
 		if ( character == 'K' ) {
-			auto it = std::ranges::find_if( whiteRooks.rbegin(), whiteRooks.rend(), [&]( auto f ) { return f > whiteKingFile; } );
-			const int file = static_cast<int>(*it);
+			const auto it = std::find_if( whiteRooks.rbegin(), whiteRooks.rend(), [&]( auto f ) { return f > whiteKingFile; } );
+			const uint8_t file = *it;
 			result.push_back( static_cast<char>('A' + file) );
 			if ( file != 0 && file != 7 )
 				m_Chess960 = true;
 		} else if ( character == 'Q' ) {
 			auto it = std::ranges::find_if( whiteRooks, [&]( auto f ) { return f < whiteKingFile; } );
-			const int file = static_cast<int>(*it);
+			const uint8_t file = *it;
 			result.push_back( static_cast<char>('A' + file) );
 			if ( file != 0 && file != 7 )
 				m_Chess960 = true;
 		} else if ( character == 'k' ) {
-			auto it = std::ranges::find_if( blackRooks.rbegin(), blackRooks.rend(), [&]( auto f ) { return f > blackKingFile; } );
-			const int file = static_cast<int>(*it);
+			auto it = std::find_if( blackRooks.rbegin(), blackRooks.rend(), [&]( auto f ) { return f > blackKingFile; } );
+			const uint8_t file = *it;
 			result.push_back( static_cast<char>('a' + file) );
 			if ( file != 0 && file != 7 )
 				m_Chess960 = true;
 		} else if ( character == 'q' ) {
 			auto it = std::ranges::find_if( blackRooks, [&]( auto f ) { return f < blackKingFile; } );
-			const int file = static_cast<int>(*it);
+			const uint8_t file = *it;
 			result.push_back( static_cast<char>('a' + file) );
 			if ( file != 0 && file != 7 )
 				m_Chess960 = true;

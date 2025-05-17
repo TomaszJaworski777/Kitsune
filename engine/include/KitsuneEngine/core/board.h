@@ -17,6 +17,7 @@ class Board {
 		uint8_t m_CastleRights;
 		Square m_enPassantSquare;
 		uint8_t m_HalfMoves;
+		Square m_Rooks[4];
 		uint8_t m_Phase;
 		bool m_Chess960;
 

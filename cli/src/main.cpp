@@ -22,7 +22,7 @@ int main() {
 	infos[16] = "   draw";
 	std::cout << "\n" << GetASCIILogo( infos ) << std::endl << std::endl;
 
-	const auto fen = FEN();
+	const auto fen = FEN( "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" );
 	std::cout << fen.ToString() << std::endl;
 
 	auto board = Board( fen );

@@ -31,6 +31,11 @@ Board::Board() {
 
 	m_Chess960 = false;
 
+	m_Rooks[0] = 0b1000;
+	m_Rooks[1] = 0b0100;
+	m_Rooks[2] = 0b0010;
+	m_Rooks[3] = 0b0001;
+
 	m_Hash = 0x325BF1EB13D84627;
 }
 
@@ -79,18 +84,19 @@ Board::Board( const FEN &fen ) {
 		return;
 	}
 
+	m_Rooks[0] = 0b1000;
+	m_Rooks[1] = 0b0100;
+	m_Rooks[2] = 0b0010;
+	m_Rooks[3] = 0b0001;
+
 	m_CastleRights = 0;
-	if ( fen.GetCastleRights().contains( 'k' ) ) {
-		m_CastleRights |= CASTLE_BLACK_KING;
-	}
-	if ( fen.GetCastleRights().contains( 'q' ) ) {
-		m_CastleRights |= CASTLE_BLACK_QUEEN;
-	}
-	if ( fen.GetCastleRights().contains( 'K' ) ) {
-		m_CastleRights |= CASTLE_WHITE_KING;
-	}
-	if ( fen.GetCastleRights().contains( 'Q' ) ) {
-		m_CastleRights |= CASTLE_WHITE_QUEEN;
+	for ( const char character : fen.GetCastleRights() ) {
+		const auto side = std::isupper( character ) ? WHITE : BLACK;
+		const auto kingSquare = GetKingSquare( side );
+		const uint8_t file = std::toupper( character ) - 'A';
+		const auto index = 2 * side + (file < kingSquare.GetFile() ? 0 : 1);
+		m_CastleRights |= 0b1000 >> index;
+		m_Rooks[index] = Square( kingSquare.GetRank(), file );
 	}
 
 	m_enPassantSquare = NULL_SQUARE;
