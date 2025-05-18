@@ -146,7 +146,7 @@ TEST_CASE( "Standard Positions", "[PerftTests]" ) {
 		const auto depth = target[0][1] - '0';
 		const uint64_t expected = std::stoi( target[1] );
 		const auto board = Board(fen);
-		const auto castleRules = board.GetCastleRules();
+		const auto castleRules = board.GenerateCastleMask();
  		DYNAMIC_SECTION( testCase[0] ) {
 			CHECK( Perft( board, castleRules, depth, true, false, true ) == expected );
 		}

@@ -12,7 +12,7 @@
 struct MoveGenerator {
 	private:
 		const Board &m_Board;
-		const CastleRules &m_CastleRules;
+		const CastleMask &m_CastleMask;
 		const Square m_KingSquare;
 		const PinMask m_PinMask;
 		const Bitboard m_AttackMap;
@@ -20,7 +20,7 @@ struct MoveGenerator {
 		const Bitboard m_KingMoveMap;
 
 	public:
-		MoveGenerator( const Board &board, const CastleRules &castleRules );
+		MoveGenerator( const Board &board, const CastleMask &castleMask );
 
 		template<MoveGenMode MODE>
 		uint8_t GenerateMoves( Move *moves ) const {
@@ -96,20 +96,20 @@ struct MoveGenerator {
 			};
 
 			if constexpr ( SIDE == WHITE ) {
-				auto rookSquare = m_CastleRules.GetRookSquare( 1 );
+				auto rookSquare = m_Board.GetRookSquare( 1 );
 				if ( m_Board.CanCastle( CASTLE_WHITE_KING ) && validateCastle( rookSquare, 6 ) ) {
 					*( moves++ ) = Move( m_KingSquare, rookSquare, KING_SIDE_CASTLE_FLAG );
 				}
-				rookSquare = m_CastleRules.GetRookSquare( 0 );
+				rookSquare = m_Board.GetRookSquare( 0 );
 				if ( m_Board.CanCastle( CASTLE_WHITE_QUEEN ) && validateCastle( rookSquare, 2 ) ) {
 					*( moves++ ) = Move( m_KingSquare, rookSquare, QUEEN_SIDE_CASTLE_FLAG );
 				}
 			} else {
-				auto rookSquare = m_CastleRules.GetRookSquare( 3 );
+				auto rookSquare = m_Board.GetRookSquare( 3 );
 				if ( m_Board.CanCastle( CASTLE_BLACK_KING ) && validateCastle( rookSquare, 62 ) ) {
 					*( moves++ ) = Move( m_KingSquare, rookSquare, KING_SIDE_CASTLE_FLAG );
 				}
-				rookSquare = m_CastleRules.GetRookSquare( 2 );
+				rookSquare = m_Board.GetRookSquare( 2 );
 				if ( m_Board.CanCastle( CASTLE_BLACK_QUEEN ) && validateCastle( rookSquare, 58 ) ) {
 					*( moves++ ) = Move( m_KingSquare, rookSquare, QUEEN_SIDE_CASTLE_FLAG );
 				}
@@ -197,7 +197,7 @@ struct MoveGenerator {
 			pawns.Map( [&moves, enPassantSquare, this]( const Square fromSquare ) {
 				Board temp = m_Board;
 				const auto mv = Move( fromSquare, enPassantSquare, EN_PASSANT_FLAG );
-				temp.MakeMove( mv, m_CastleRules );
+				temp.MakeMove( mv, m_CastleMask );
 
 				if ( !Attacks::IsSquareAttacked( temp, m_Board.GetKingSquare( SIDE ), SIDE ) ) {
 					( *moves++ ) = mv;

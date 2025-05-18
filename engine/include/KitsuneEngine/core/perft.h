@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include "castle_rules.h"
+#include "castle_mask.h"
 
 class Board;
 
-uint64_t Perft( const Board &board, const CastleRules &castleRules, uint8_t depth, bool bulk, bool printSplit, bool isFirst );
+uint64_t Perft( const Board &board, const CastleMask &castleMask, uint8_t depth, bool bulk, bool printSplit, bool isFirst );

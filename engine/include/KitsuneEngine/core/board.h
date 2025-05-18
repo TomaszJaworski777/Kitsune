@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bitboard.h"
-#include "castle_rules.h"
+#include "castle_mask.h"
 #include "move.h"
 #include "zobrist_hash.h"
 #include "../types.h"
@@ -58,6 +58,11 @@ class Board {
 		[[nodiscard]]
 		constexpr uint8_t GetHalfMoves() const {
 			return m_HalfMoves;
+		}
+
+		[[nodiscard]]
+		constexpr Square GetRookSquare( const uint8_t idx ) const {
+			return m_Rooks[idx];
 		}
 
 		[[nodiscard]]
@@ -129,9 +134,8 @@ class Board {
 		}
 
 		[[nodiscard]]
-		constexpr CastleRules GetCastleRules() const {
-			return CastleRules( GetPieceMask( ROOK, WHITE ), GetPieceMask( ROOK, BLACK ),
-			               GetKingSquare( WHITE ), GetKingSquare( BLACK ) );
+		constexpr CastleMask GenerateCastleMask() const {
+			return CastleMask( m_Rooks, GetKingSquare( WHITE ), GetKingSquare( BLACK ) );
 		}
 
 		[[nodiscard]]
@@ -143,7 +147,7 @@ class Board {
 		[[nodiscard]]
 		std::string ToFEN() const;
 
-		constexpr void MakeMove( const Move &move, const CastleRules &castleRules ) {
+		constexpr void MakeMove( const Move &move, const CastleMask &castleRules ) {
 			if ( m_Side == WHITE ) {
 				MakeMove_Side<WHITE>( move, castleRules );
 			} else {
@@ -153,7 +157,7 @@ class Board {
 
 	private:
 		template<SideToMove SIDE>
-		constexpr void MakeMove_Side( const Move &move, const CastleRules &castleRules ) {
+		constexpr void MakeMove_Side( const Move &move, const CastleMask &castleRules ) {
 			switch ( move.GetFlag() ) {
 				case QUIET_MOVE_FLAG: MakeMove_Flag<SIDE, QUIET_MOVE_FLAG>( move, castleRules ); break;
 				case DOUBLE_PUSH_FLAG: MakeMove_Flag<SIDE, DOUBLE_PUSH_FLAG>( move, castleRules ); break;
@@ -174,7 +178,7 @@ class Board {
 		}
 
 		template<SideToMove SIDE, MoveFlag FLAG>
-		constexpr void MakeMove_Flag( const Move &move, const CastleRules &castleRules )   {
+		constexpr void MakeMove_Flag( const Move &move, const CastleMask &castleRules )   {
 			const Square fromSquare = move.GetFromSquare();
 			const Square toSquare = move.GetToSquare();
 
