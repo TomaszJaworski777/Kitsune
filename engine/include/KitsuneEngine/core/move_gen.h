@@ -90,7 +90,8 @@ struct MoveGenerator {
 			auto validateCastle = [this]( const Square rookSquare, const Square kingDest, const Square rookDest ) -> bool {
 				const auto castlePath = Rays::GetRay( rookSquare, rookDest ) | Rays::GetRay( m_KingSquare, kingDest );
 				const auto occupancy = m_Board.GetOccupancy() ^ Bitboard( rookSquare ) ^ Bitboard( m_KingSquare );
-				return !( Rays::GetRay( m_KingSquare, kingDest ) & m_AttackMap ) && !( castlePath & occupancy );
+				return !( Rays::GetRay( m_KingSquare, kingDest ) & m_AttackMap ) && !( castlePath & occupancy ) && !(
+					       m_PinMask.GetOrthographicMask() & Bitboard( rookSquare ) );
 			};
 
 			if constexpr ( SIDE == WHITE ) {

@@ -23,27 +23,13 @@ int main() {
 	infos[16] = "   draw";
 	std::cout << "\n" << GetASCIILogo( infos ) << std::endl << std::endl;
 
-	const auto fen = FEN( "b1q1rrkb/pppppppp/3nn3/8/P7/1PPP4/4PPPP/BQNNRKRB w GE - 1 9" );
+	const auto fen = FEN( "Qr1k1rbb/2p2ppp/1n1pq3/1p2p3/1P1P4/8/P1P1PPPP/NRN1KRBB b fb - 0 10" );
 	std::cout << fen.ToString() << std::endl;
 
 	auto board = Board( fen );
 	const auto castleMask = board.GenerateCastleMask();
 
-	board.MakeMove( Move( F1, G1, KING_SIDE_CASTLE_FLAG ), castleMask );
-
-	board.MakeMove( Move( A7, A6, QUIET_MOVE_FLAG ), castleMask );
-
 	std::cout << board.ToString() << std::endl;
-	std::cout << board.GetOccupancy().ToString() << std::endl;
-
-	std::cout << board.GetRookSquare( 0 ).ToString() << std::endl;
-	std::cout << board.GetRookSquare( 1 ).ToString() << std::endl;
-	std::cout << board.GetRookSquare( 2 ).ToString() << std::endl;
-	std::cout << board.GetRookSquare( 3 ).ToString() << std::endl;
-
-	// for ( int i = 0; i < 64; ++i ) {
-	// 	std::cout << static_cast<uint32_t>(castleRules.GetMask( i )) << std::endl;
-	// }
 
 	auto thread = std::jthread( [&board, &castleMask]( std::stop_token token ) {
 		auto t = std::chrono::high_resolution_clock::now();
@@ -54,13 +40,13 @@ int main() {
 		std::cout << "Time: " << duration << std::endl;
 		std::cout << "Speed: " << ( result * 1000 / ( duration.count() + 1 ) ) << "nps" << std::endl << std::endl << std::endl;
 
-		// t = std::chrono::high_resolution_clock::now();
-		// result = Perft( board, castleRules, 7, true, true, true );
-		// duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-		// 	std::chrono::high_resolution_clock::now() - t );
-		// std::cout << "Result: " << result << std::endl;
-		// std::cout << "Time: " << duration << std::endl;
-		// std::cout << "Speed: " << ( result * 1000 / ( duration.count() + 1 ) ) << "nps" << std::endl << std::endl << std::endl;
+		t = std::chrono::high_resolution_clock::now();
+		result = Perft( board, castleMask, 7, true, true, true );
+		duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+			std::chrono::high_resolution_clock::now() - t );
+		std::cout << "Result: " << result << std::endl;
+		std::cout << "Time: " << duration << std::endl;
+		std::cout << "Speed: " << ( result * 1000 / ( duration.count() + 1 ) ) << "nps" << std::endl << std::endl << std::endl;
 	} );
 
 	thread.join();
