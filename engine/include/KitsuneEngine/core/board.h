@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "bitboard.h"
 #include "castle_mask.h"
 #include "move.h"
@@ -147,11 +149,11 @@ class Board {
 		[[nodiscard]]
 		std::string ToFEN() const;
 
-		constexpr void MakeMove( const Move &move, const CastleMask &castleRules ) {
+		constexpr void MakeMove( const Move &move, const CastleMask &castleMask ) {
 			if ( m_Side == WHITE ) {
-				MakeMove_Side<WHITE>( move, castleRules );
+				MakeMove_Side<WHITE>( move, castleMask );
 			} else {
-				MakeMove_Side<BLACK>( move, castleRules );
+				MakeMove_Side<BLACK>( move, castleMask );
 			}
 		}
 
@@ -212,12 +214,12 @@ class Board {
 					m_enPassantSquare = toSquare ^ 8;
 					break;
 				case QUEEN_SIDE_CASTLE_FLAG:
-					RemovePieceOnSquare( sideFlip, ROOK, SIDE );
+					RemovePieceOnSquare( m_Rooks[SIDE * 2], ROOK, SIDE );
 					SetPieceOnSquare( sideFlip + 3, ROOK, SIDE );
 					SetPieceOnSquare( sideFlip + 2, KING, SIDE );
 					break;
 				case KING_SIDE_CASTLE_FLAG:
-					RemovePieceOnSquare( sideFlip + 7, ROOK, SIDE );
+					RemovePieceOnSquare( m_Rooks[SIDE * 2 + 1], ROOK, SIDE );
 					SetPieceOnSquare( sideFlip + 5, ROOK, SIDE );
 					SetPieceOnSquare( sideFlip + 6, KING, SIDE );
 					break;

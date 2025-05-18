@@ -23,13 +23,18 @@ int main() {
 	infos[16] = "   draw";
 	std::cout << "\n" << GetASCIILogo( infos ) << std::endl << std::endl;
 
-	const auto fen = FEN( "bqnb1rkr/pp3ppp/3ppn2/2p5/5P2/P2P4/NPP1P1PP/BQ1BNRKR w HFhf - 2 9" );
+	const auto fen = FEN( "b1q1rrkb/pppppppp/3nn3/8/P7/1PPP4/4PPPP/BQNNRKRB w GE - 1 9" );
 	std::cout << fen.ToString() << std::endl;
 
 	auto board = Board( fen );
-	std::cout << board.ToString() << std::endl;
+	const auto castleMask = board.GenerateCastleMask();
 
-	const auto castleRules = board.GenerateCastleMask();
+	board.MakeMove( Move( F1, G1, KING_SIDE_CASTLE_FLAG ), castleMask );
+
+	board.MakeMove( Move( A7, A6, QUIET_MOVE_FLAG ), castleMask );
+
+	std::cout << board.ToString() << std::endl;
+	std::cout << board.GetOccupancy().ToString() << std::endl;
 
 	std::cout << board.GetRookSquare( 0 ).ToString() << std::endl;
 	std::cout << board.GetRookSquare( 1 ).ToString() << std::endl;
@@ -40,9 +45,9 @@ int main() {
 	// 	std::cout << static_cast<uint32_t>(castleRules.GetMask( i )) << std::endl;
 	// }
 
-	auto thread = std::jthread( [&board, &castleRules]( std::stop_token token ) {
+	auto thread = std::jthread( [&board, &castleMask]( std::stop_token token ) {
 		auto t = std::chrono::high_resolution_clock::now();
-		uint64_t result = Perft( board, castleRules, 1, false, true, true );
+		uint64_t result = Perft( board, castleMask, 1, false, true, true );
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::high_resolution_clock::now() - t );
 		std::cout << "Result: " << result << std::endl;

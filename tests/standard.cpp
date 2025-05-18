@@ -139,12 +139,12 @@ static const std::string TEST_CASES[128]{
 static std::vector<std::string> Split( const std::string &str, char delimiter );
 
 TEST_CASE( "Standard Positions", "[PerftTests]" ) {
-	for ( uint32_t i = 0; i < 128; i++ ) {
-		const auto testCase = Split( TEST_CASES[i], ';' );
+	for ( const auto &line : TEST_CASES ) {
+		const auto testCase = Split( line, ';' );
 		const auto fen = FEN( testCase[0] );
 		const auto target = Split( testCase[testCase.size() - 1], ' ' );
 		const auto depth = target[0][1] - '0';
-		const uint64_t expected = std::stoi( target[1] );
+		const uint64_t expected = std::stoll( target[1] );
 		const auto board = Board(fen);
 		const auto castleRules = board.GenerateCastleMask();
  		DYNAMIC_SECTION( testCase[0] ) {

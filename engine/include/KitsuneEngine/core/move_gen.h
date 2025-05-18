@@ -87,30 +87,28 @@ struct MoveGenerator {
 
 		template<SideToMove SIDE>
 		Move* GetCastleMoves( Move *moves ) const {
-
-			auto validateCastle = [this](const Square rookSquare, const Square kingDestination) -> Bitboard {
-				const auto castlePath = Rays::GetRay( m_KingSquare, rookSquare ) | Rays::GetRay( m_KingSquare, kingDestination );
-				const auto occupancy = m_Board.GetOccupancy() ^ Bitboard( rookSquare );
-
-				return !( Rays::GetRay( m_KingSquare, kingDestination ) & m_AttackMap ) && !( castlePath &  occupancy );
+			auto validateCastle = [this]( const Square rookSquare, const Square kingDest, const Square rookDest ) -> bool {
+				const auto castlePath = Rays::GetRay( rookSquare, rookDest ) | Rays::GetRay( m_KingSquare, kingDest );
+				const auto occupancy = m_Board.GetOccupancy() ^ Bitboard( rookSquare ) ^ Bitboard( m_KingSquare );
+				return !( Rays::GetRay( m_KingSquare, kingDest ) & m_AttackMap ) && !( castlePath & occupancy );
 			};
 
 			if constexpr ( SIDE == WHITE ) {
 				auto rookSquare = m_Board.GetRookSquare( 1 );
-				if ( m_Board.CanCastle( CASTLE_WHITE_KING ) && validateCastle( rookSquare, 6 ) ) {
+				if ( m_Board.CanCastle( CASTLE_WHITE_KING ) && validateCastle( rookSquare, 6, 5 ) ) {
 					*( moves++ ) = Move( m_KingSquare, rookSquare, KING_SIDE_CASTLE_FLAG );
 				}
 				rookSquare = m_Board.GetRookSquare( 0 );
-				if ( m_Board.CanCastle( CASTLE_WHITE_QUEEN ) && validateCastle( rookSquare, 2 ) ) {
+				if ( m_Board.CanCastle( CASTLE_WHITE_QUEEN ) && validateCastle( rookSquare, 2, 3 ) ) {
 					*( moves++ ) = Move( m_KingSquare, rookSquare, QUEEN_SIDE_CASTLE_FLAG );
 				}
 			} else {
 				auto rookSquare = m_Board.GetRookSquare( 3 );
-				if ( m_Board.CanCastle( CASTLE_BLACK_KING ) && validateCastle( rookSquare, 62 ) ) {
+				if ( m_Board.CanCastle( CASTLE_BLACK_KING ) && validateCastle( rookSquare, 62, 61 ) ) {
 					*( moves++ ) = Move( m_KingSquare, rookSquare, KING_SIDE_CASTLE_FLAG );
 				}
 				rookSquare = m_Board.GetRookSquare( 2 );
-				if ( m_Board.CanCastle( CASTLE_BLACK_QUEEN ) && validateCastle( rookSquare, 58 ) ) {
+				if ( m_Board.CanCastle( CASTLE_BLACK_QUEEN ) && validateCastle( rookSquare, 58, 59 ) ) {
 					*( moves++ ) = Move( m_KingSquare, rookSquare, QUEEN_SIDE_CASTLE_FLAG );
 				}
 			}
