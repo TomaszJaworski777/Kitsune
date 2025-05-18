@@ -5,10 +5,10 @@
 
 std::string Bitboard::ToString() const {
 	std::string result = " -----------------\n";
-	for(int rank = 7; rank >= 0; rank--) {
+	for ( int rank = 7; rank >= 0; rank-- ) {
 		result += "|";
-		for(int file = 0; file < 8; file++) {
-			if ( const auto square = Square(rank, file); GetBit(square) ) {
+		for ( int file = 0; file < 8; file++ ) {
+			if ( const auto square = Square( rank, file ); GetBit( square ) ) {
 				result += ColorText( " 1", GREEN );
 			} else {
 				result += ColorText( " 0", RED );
@@ -18,6 +18,6 @@ std::string Bitboard::ToString() const {
 	}
 
 	result += " -----------------\n";
-	result += std::format("  Bitboard: {}\n", m_Value);
+	result += std::format( "  Bitboard: {}\n", m_Value );
 	return result;
 }
