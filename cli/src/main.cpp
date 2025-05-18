@@ -22,7 +22,7 @@ int main() {
 	infos[16] = "   draw";
 	std::cout << "\n" << GetASCIILogo( infos ) << std::endl << std::endl;
 
-	const auto fen = FEN( "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1" );
+	const auto fen = FEN( );
 	std::cout << fen.ToString() << std::endl;
 
 	auto board = Board( fen );
@@ -41,20 +41,20 @@ int main() {
 
 	auto thread = std::jthread( [&board, &castleRules]( std::stop_token token ) {
 		auto t = std::chrono::high_resolution_clock::now();
-		uint64_t result = Perft( board, castleRules, 5, false, true, true );
+		uint64_t result = Perft( board, castleRules, 6, false, true, true );
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::high_resolution_clock::now() - t );
 		std::cout << "Result: " << result << std::endl;
 		std::cout << "Time: " << duration << std::endl;
-		std::cout << "Speed: " << ( result * 1000 / duration.count() ) << "nps" << std::endl << std::endl << std::endl;
+		std::cout << "Speed: " << ( result * 1000 / ( duration.count() + 1 ) ) << "nps" << std::endl << std::endl << std::endl;
 
 		t = std::chrono::high_resolution_clock::now();
-		result = Perft( board, castleRules, 6, true, true, true );
+		result = Perft( board, castleRules, 7, true, true, true );
 		duration = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::high_resolution_clock::now() - t );
 		std::cout << "Result: " << result << std::endl;
 		std::cout << "Time: " << duration << std::endl;
-		std::cout << "Speed: " << ( result * 1000 / duration.count() ) << "nps" << std::endl << std::endl << std::endl;
+		std::cout << "Speed: " << ( result * 1000 / ( duration.count() + 1 ) ) << "nps" << std::endl << std::endl << std::endl;
 	} );
 
 	thread.join();

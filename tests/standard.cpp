@@ -1,3 +1,4 @@
+#include <iostream>
 #include <catch2/catch_test_macros.hpp>
 
 #include "KitsuneEngine/core/board.h"
@@ -146,7 +147,9 @@ TEST_CASE( "Standard Positions", "[PerftTests]" ) {
 		const uint64_t expected = std::stoi( target[1] );
 		const auto board = Board(fen);
 		const auto castleRules = board.GetCastleRules();
-		DYNAMIC_SECTION( testCase[0] ) { CHECK( Perft( board, castleRules, depth, true, false, true ) == expected ); }
+ 		DYNAMIC_SECTION( testCase[0] ) {
+			CHECK( Perft( board, castleRules, depth, true, false, true ) == expected );
+		}
 	}
 }
 

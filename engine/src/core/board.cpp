@@ -31,10 +31,10 @@ Board::Board() {
 
 	m_Chess960 = false;
 
-	m_Rooks[0] = 0b1000;
-	m_Rooks[1] = 0b0100;
-	m_Rooks[2] = 0b0010;
-	m_Rooks[3] = 0b0001;
+	m_Rooks[0] = A1;
+	m_Rooks[1] = H1;
+	m_Rooks[2] = A8;
+	m_Rooks[3] = H8;
 
 	m_Hash = 0x325BF1EB13D84627;
 }
@@ -59,7 +59,7 @@ Board::Board( const FEN &fen ) {
 					break;
 				case 'b': SetPieceOnSquare( square, BISHOP, pieceColor );
 					break;
-				case 'r': SetPieceOnSquare( square, ROOK, pieceColor );
+				case 'r': SetPieceOnSquare( square, ROOK, pieceColor );;
 					break;
 				case 'q': SetPieceOnSquare( square, QUEEN, pieceColor );
 					break;
@@ -84,13 +84,16 @@ Board::Board( const FEN &fen ) {
 		return;
 	}
 
-	m_Rooks[0] = 0b1000;
-	m_Rooks[1] = 0b0100;
-	m_Rooks[2] = 0b0010;
-	m_Rooks[3] = 0b0001;
+	m_Rooks[0] = NULL_SQUARE;
+	m_Rooks[1] = NULL_SQUARE;
+	m_Rooks[2] = NULL_SQUARE;
+	m_Rooks[3] = NULL_SQUARE;
 
 	m_CastleRights = 0;
 	for ( const char character : fen.GetCastleRights() ) {
+		if ( character == '-' )
+			break;
+
 		const auto side = std::isupper( character ) ? WHITE : BLACK;
 		const auto kingSquare = GetKingSquare( side );
 		const uint8_t file = std::toupper( character ) - 'A';
@@ -126,16 +129,16 @@ std::string Board::ToString() const {
 	std::string castleRights = "";
 
 	if ( CanCastle( CASTLE_WHITE_KING ) ) {
-		castleRights += "K";
+		castleRights += 'A' + m_Rooks[1].GetFile();
 	}
 	if ( CanCastle( CASTLE_WHITE_QUEEN ) ) {
-		castleRights += "Q";
+		castleRights += 'A' + m_Rooks[0].GetFile();
 	}
 	if ( CanCastle( CASTLE_BLACK_KING ) ) {
-		castleRights += "k";
+		castleRights += 'a' + m_Rooks[3].GetFile();
 	}
 	if ( CanCastle( CASTLE_BLACK_QUEEN ) ) {
-		castleRights += "q";
+		castleRights += 'a' + m_Rooks[2].GetFile();
 	}
 	if ( castleRights == "" ) {
 		castleRights = "-";

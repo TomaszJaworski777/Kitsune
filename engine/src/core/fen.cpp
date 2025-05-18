@@ -16,7 +16,7 @@ FEN::FEN( const std::string &str ) {
 
 	m_SideToMove = fenSplit[1];
 
-	m_CastleRights = NormalizeCastleRights( positionParts, fenSplit[2] );
+	m_CastleRights = NormalizeCastleRights( fenSplit[2] );
 
 	m_EnPassantSquare = fenSplit[3];
 
@@ -108,10 +108,7 @@ std::vector<std::string> FEN::Split( const std::string &str, const char delimite
 	return tokens;
 }
 
-std::string FEN::NormalizeCastleRights(
-	const std::vector<std::string> &position,
-	const std::string &rights
-) {
+std::string FEN::NormalizeCastleRights( const std::string &rights ) {
 	auto findFiles = []( const std::string &fenRank, const char target ) {
 		std::vector<uint8_t> files;
 		uint8_t file = 0;
@@ -127,11 +124,14 @@ std::string FEN::NormalizeCastleRights(
 		return files;
 	};
 
-	const uint8_t whiteKingFile = findFiles( position[7], 'K' )[0];
-	const uint8_t blackKingFile = findFiles( position[0], 'k' )[0];
+	const auto whiteKings = findFiles( m_Board[7], 'K' );
+	const auto blackKings = findFiles( m_Board[0], 'k' );
 
-	const auto whiteRooks = findFiles( position[7], 'R' );
-	const auto blackRooks = findFiles( position[0], 'r' );
+	const uint8_t whiteKingFile = whiteKings.empty() ? 255 : whiteKings[0];
+	const uint8_t blackKingFile = blackKings.empty() ? 255 : blackKings[0];
+
+	const auto whiteRooks = findFiles( m_Board[7], 'R' );
+	const auto blackRooks = findFiles( m_Board[0], 'r' );
 
 	m_Chess960 = false;
 
@@ -143,25 +143,25 @@ std::string FEN::NormalizeCastleRights(
 	result.reserve( rights.size() );
 
 	for ( const char character: rights ) {
-		if ( character == 'K' ) {
+		if ( character == 'K' && whiteKingFile < 8 ) {
 			const auto it = std::find_if( whiteRooks.rbegin(), whiteRooks.rend(), [&]( auto f ) { return f > whiteKingFile; } );
 			const uint8_t file = *it;
 			result.push_back( static_cast<char>('A' + file) );
 			if ( file != 0 && file != 7 )
 				m_Chess960 = true;
-		} else if ( character == 'Q' ) {
+		} else if ( character == 'Q' && whiteKingFile < 8 ) {
 			auto it = std::ranges::find_if( whiteRooks, [&]( auto f ) { return f < whiteKingFile; } );
 			const uint8_t file = *it;
 			result.push_back( static_cast<char>('A' + file) );
 			if ( file != 0 && file != 7 )
 				m_Chess960 = true;
-		} else if ( character == 'k' ) {
+		} else if ( character == 'k' && blackKingFile < 8 ) {
 			auto it = std::find_if( blackRooks.rbegin(), blackRooks.rend(), [&]( auto f ) { return f > blackKingFile; } );
 			const uint8_t file = *it;
 			result.push_back( static_cast<char>('a' + file) );
 			if ( file != 0 && file != 7 )
 				m_Chess960 = true;
-		} else if ( character == 'q' ) {
+		} else if ( character == 'q' && blackKingFile < 8 ) {
 			auto it = std::ranges::find_if( blackRooks, [&]( auto f ) { return f < blackKingFile; } );
 			const uint8_t file = *it;
 			result.push_back( static_cast<char>('a' + file) );
