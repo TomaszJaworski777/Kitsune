@@ -10,9 +10,11 @@ src=".readme/logos/kitsune_round_corners.png">
 <br>
 <br>
 
-[![License](https://img.shields.io/github/license/TomaszJaworski777/Kitsune?style=for-the-badge)](https://opensource.org/license/gpl-3-0)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/TomaszJaworski777/Kitsune?style=for-the-badge)](https://github.com/TomaszJaworski777/Kitsune/releases/latest)
-[![Commits](https://img.shields.io/github/commits-since/TomaszJaworski777/Kitsune/latest?style=for-the-badge)](https://github.com/TomaszJaworski777/Kitsune/commits/main)
+[![License][license-badge]][license-link]
+[![GitHub release (latest by date)][release-badge]][release-link]
+[![Commits][commits-badge]][commits-link]
+<br>
+[![Tests][tests-badge]][tests-link]
 <br>
 <br>
 
@@ -30,3 +32,14 @@ src=".readme/logos/kitsune_round_corners.png">
 ## Command List
 
 ## Feature List
+
+
+[license-badge]: https://img.shields.io/github/license/TomaszJaworski777/Kitsune?style=for-the-badge
+[release-badge]: https://img.shields.io/github/v/release/TomaszJaworski777/Kitsune?style=for-the-badge
+[commits-badge]: https://img.shields.io/github/commits-since/TomaszJaworski777/Kitsune/latest?style=for-the-badge
+[tests-badge]: https://img.shields.io/github/actions/workflow/status/TomaszJaworski777/Kitsune/catch2_tests.yml?branch=main&style=for-the-badge&label=Tests&logo=github
+
+[license-link]: https://opensource.org/license/gpl-3-0
+[release-link]: https://github.com/TomaszJaworski777/Kitsune/releases/latest
+[commits-link]: https://github.com/TomaszJaworski777/Kitsune/commits/main
+[tests-link]: https://github.com/TomaszJaworski777/Kitsune/blob/main/.github/workflows/catch2_tests.yml

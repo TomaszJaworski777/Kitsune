@@ -1,0 +1,56 @@
+name: Catch2 Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest]
+        build_type: [Release]
+        c_compiler: [cl]
+        include:
+          - os: windows-latest
+            c_compiler: cl
+            cpp_compiler: cl
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "tests-output-dir=${{ github.workspace }}/tests" >> "$GITHUB_OUTPUT"
+
+    - name: Cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.strings.outputs.tests-output-dir }}/_deps
+        key: ${{ matrix.os }}-tests
+
+    - name: Configure CMake
+      run: >
+        cmake -B ${{ steps.strings.outputs.tests-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.tests-output-dir }} --config ${{ matrix.build_type }} --target Kitsune-Tests -j 30
+
+    - name: Test
+      working-directory: ${{ steps.strings.outputs.tests-output-dir }}/tests
+      run: ctest --build-config ${{ matrix.build_type }}
+      
+    - name: Tree
+      run: |
+        tree ${{ steps.strings.outputs.tests-output-dir }}
+        
