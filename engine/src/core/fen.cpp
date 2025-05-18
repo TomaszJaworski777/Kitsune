@@ -2,6 +2,7 @@
 
 #include <format>
 #include <sstream>
+#include <algorithm>
 
 #include "KitsuneEngine/core/square.h"
 
@@ -14,7 +15,9 @@ FEN::FEN( const std::string &str ) {
 	}
 
 	m_SideToMove = fenSplit[1];
-	m_CastleRights = fenSplit[2];
+
+	m_CastleRights = NormalizeCastleRights( fenSplit[2] );
+
 	m_EnPassantSquare = fenSplit[3];
 
 	if ( fenSplit.size() > 4 ) {
@@ -43,19 +46,6 @@ bool FEN::IsFenValid( const std::string &str ) {
 	}
 
 	if ( fenSplit[1] != "w" && fenSplit[1] != "b" ) {
-		return false;
-	}
-
-	if ( fenSplit[2].size() == 1 && fenSplit[2] != "-" ) {
-		return false;
-	}
-
-	const bool correctCastleRights = fenSplit[2].contains( 'K' )
-	                                 || fenSplit[2].contains( 'Q' )
-	                                 || fenSplit[2].contains( 'k' )
-	                                 || fenSplit[2].contains( 'q' );
-
-	if ( fenSplit[2].size() > 4 || !correctCastleRights ) {
 		return false;
 	}
 
@@ -118,3 +108,75 @@ std::vector<std::string> FEN::Split( const std::string &str, const char delimite
 	return tokens;
 }
 
+std::string FEN::NormalizeCastleRights( const std::string &rights ) {
+	auto findFiles = []( const std::string &fenRank, const char target ) {
+		std::vector<uint8_t> files;
+		uint8_t file = 0;
+		for ( const char character: fenRank ) {
+			if ( std::isdigit( character ) ) {
+				file += character - '0';
+			} else {
+				if ( character == target )
+					files.push_back( file );
+				file++;
+			}
+		}
+		return files;
+	};
+
+	const auto whiteKings = findFiles( m_Board[7], 'K' );
+	const auto blackKings = findFiles( m_Board[0], 'k' );
+
+	const uint8_t whiteKingFile = whiteKings.empty() ? 255 : whiteKings[0];
+	const uint8_t blackKingFile = blackKings.empty() ? 255 : blackKings[0];
+
+	const auto whiteRooks = findFiles( m_Board[7], 'R' );
+	const auto blackRooks = findFiles( m_Board[0], 'r' );
+
+	m_Chess960 = false;
+
+	if ( rights == "-" ) {
+		return "-";
+	}
+
+	std::string result;
+	result.reserve( rights.size() );
+
+	for ( const char character: rights ) {
+		if ( character == 'K' && whiteKingFile < 8 ) {
+			const auto it = std::find_if( whiteRooks.rbegin(), whiteRooks.rend(), [&]( auto f ) { return f > whiteKingFile; } );
+			const uint8_t file = *it;
+			result.push_back( static_cast<char>('A' + file) );
+			if ( file != 0 && file != 7 )
+				m_Chess960 = true;
+		} else if ( character == 'Q' && whiteKingFile < 8 ) {
+			auto it = std::ranges::find_if( whiteRooks, [&]( auto f ) { return f < whiteKingFile; } );
+			const uint8_t file = *it;
+			result.push_back( static_cast<char>('A' + file) );
+			if ( file != 0 && file != 7 )
+				m_Chess960 = true;
+		} else if ( character == 'k' && blackKingFile < 8 ) {
+			auto it = std::find_if( blackRooks.rbegin(), blackRooks.rend(), [&]( auto f ) { return f > blackKingFile; } );
+			const uint8_t file = *it;
+			result.push_back( static_cast<char>('a' + file) );
+			if ( file != 0 && file != 7 )
+				m_Chess960 = true;
+		} else if ( character == 'q' && blackKingFile < 8 ) {
+			auto it = std::ranges::find_if( blackRooks, [&]( auto f ) { return f < blackKingFile; } );
+			const uint8_t file = *it;
+			result.push_back( static_cast<char>('a' + file) );
+			if ( file != 0 && file != 7 )
+				m_Chess960 = true;
+		} else if ( std::isupper( character ) ) {
+			result.push_back( character );
+			if ( character != 'A' && character != 'H' )
+				m_Chess960 = true;
+		} else if ( std::islower( character ) ) {
+			result.push_back( character );
+			if ( character != 'a' && character != 'h' )
+				m_Chess960 = true;
+		}
+	}
+
+	return result.empty() ? "-" : result;
+}

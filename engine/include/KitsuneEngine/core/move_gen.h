@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <__msvc_ostream.hpp>
 
 #include "bitboard.h"
 #include "board.h"
@@ -13,6 +12,7 @@
 struct MoveGenerator {
 	private:
 		const Board &m_Board;
+		const CastleMask &m_CastleMask;
 		const Square m_KingSquare;
 		const PinMask m_PinMask;
 		const Bitboard m_AttackMap;
@@ -20,7 +20,7 @@ struct MoveGenerator {
 		const Bitboard m_KingMoveMap;
 
 	public:
-		MoveGenerator( const Board &board );
+		MoveGenerator( const Board &board, const CastleMask &castleMask );
 
 		template<MoveGenMode MODE>
 		uint8_t GenerateMoves( Move *moves ) const {
@@ -87,21 +87,30 @@ struct MoveGenerator {
 
 		template<SideToMove SIDE>
 		Move* GetCastleMoves( Move *moves ) const {
-			if ( SIDE == WHITE ) {
-				if ( m_Board.CanCastle( CASTLE_WHITE_KING ) && !( 0x60 & m_AttackMap ) && !( 0x60 & m_Board.GetOccupancy() ) ) {
-					*( moves++ ) = Move( 4, 6, KING_SIDE_CASTLE_FLAG );
+			auto validateCastle = [this]( const Square rookSquare, const Square kingDest, const Square rookDest ) -> bool {
+				const auto castlePath = Rays::GetRay( rookSquare, rookDest ) | Rays::GetRay( m_KingSquare, kingDest );
+				const auto occupancy = m_Board.GetOccupancy() ^ Bitboard( rookSquare ) ^ Bitboard( m_KingSquare );
+				return !( Rays::GetRay( m_KingSquare, kingDest ) & m_AttackMap ) && !( castlePath & occupancy ) && !(
+					       m_PinMask.GetOrthographicMask() & Bitboard( rookSquare ) );
+			};
+
+			if constexpr ( SIDE == WHITE ) {
+				auto rookSquare = m_Board.GetRookSquare( 1 );
+				if ( m_Board.CanCastle( CASTLE_WHITE_KING ) && validateCastle( rookSquare, 6, 5 ) ) {
+					*( moves++ ) = Move( m_KingSquare, rookSquare, KING_SIDE_CASTLE_FLAG );
 				}
-				if ( m_Board.CanCastle( CASTLE_WHITE_QUEEN ) && !( 0xC & m_AttackMap ) && !( 0xE & m_Board.GetOccupancy() ) ) {
-					*( moves++ ) = Move( 4, 2, QUEEN_SIDE_CASTLE_FLAG );
+				rookSquare = m_Board.GetRookSquare( 0 );
+				if ( m_Board.CanCastle( CASTLE_WHITE_QUEEN ) && validateCastle( rookSquare, 2, 3 ) ) {
+					*( moves++ ) = Move( m_KingSquare, rookSquare, QUEEN_SIDE_CASTLE_FLAG );
 				}
 			} else {
-				if ( m_Board.CanCastle( CASTLE_BLACK_KING ) && !( 0x6000000000000000 & m_AttackMap ) && !(
-					     0x6000000000000000 & m_Board.GetOccupancy() ) ) {
-					*( moves++ ) = Move( 60, 62, KING_SIDE_CASTLE_FLAG );
+				auto rookSquare = m_Board.GetRookSquare( 3 );
+				if ( m_Board.CanCastle( CASTLE_BLACK_KING ) && validateCastle( rookSquare, 62, 61 ) ) {
+					*( moves++ ) = Move( m_KingSquare, rookSquare, KING_SIDE_CASTLE_FLAG );
 				}
-				if ( m_Board.CanCastle( CASTLE_BLACK_QUEEN ) && !( 0xC00000000000000 & m_AttackMap ) && !(
-					     0xE00000000000000 & m_Board.GetOccupancy() ) ) {
-					*( moves++ ) = Move( 60, 58, QUEEN_SIDE_CASTLE_FLAG );
+				rookSquare = m_Board.GetRookSquare( 2 );
+				if ( m_Board.CanCastle( CASTLE_BLACK_QUEEN ) && validateCastle( rookSquare, 58, 59 ) ) {
+					*( moves++ ) = Move( m_KingSquare, rookSquare, QUEEN_SIDE_CASTLE_FLAG );
 				}
 			}
 
@@ -187,7 +196,7 @@ struct MoveGenerator {
 			pawns.Map( [&moves, enPassantSquare, this]( const Square fromSquare ) {
 				Board temp = m_Board;
 				const auto mv = Move( fromSquare, enPassantSquare, EN_PASSANT_FLAG );
-				temp.MakeMove( mv );
+				temp.MakeMove( mv, m_CastleMask );
 
 				if ( !Attacks::IsSquareAttacked( temp, m_Board.GetKingSquare( SIDE ), SIDE ) ) {
 					( *moves++ ) = mv;

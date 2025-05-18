@@ -29,6 +29,13 @@ Board::Board() {
 	m_HalfMoves = 0;
 	m_Phase = 24;
 
+	m_Chess960 = false;
+
+	m_Rooks[0] = A1;
+	m_Rooks[1] = H1;
+	m_Rooks[2] = A8;
+	m_Rooks[3] = H8;
+
 	m_Hash = 0x325BF1EB13D84627;
 }
 
@@ -52,7 +59,7 @@ Board::Board( const FEN &fen ) {
 					break;
 				case 'b': SetPieceOnSquare( square, BISHOP, pieceColor );
 					break;
-				case 'r': SetPieceOnSquare( square, ROOK, pieceColor );
+				case 'r': SetPieceOnSquare( square, ROOK, pieceColor );;
 					break;
 				case 'q': SetPieceOnSquare( square, QUEEN, pieceColor );
 					break;
@@ -62,6 +69,8 @@ Board::Board( const FEN &fen ) {
 			}
 		}
 	}
+
+	m_Chess960 = fen.IsChess960();
 
 	if ( fen.GetSideToMove() == "w" ) {
 		m_Side = WHITE;
@@ -75,18 +84,22 @@ Board::Board( const FEN &fen ) {
 		return;
 	}
 
+	m_Rooks[0] = NULL_SQUARE;
+	m_Rooks[1] = NULL_SQUARE;
+	m_Rooks[2] = NULL_SQUARE;
+	m_Rooks[3] = NULL_SQUARE;
+
 	m_CastleRights = 0;
-	if ( fen.GetCastleRights().contains( 'k' ) ) {
-		m_CastleRights |= CASTLE_BLACK_KING;
-	}
-	if ( fen.GetCastleRights().contains( 'q' ) ) {
-		m_CastleRights |= CASTLE_BLACK_QUEEN;
-	}
-	if ( fen.GetCastleRights().contains( 'K' ) ) {
-		m_CastleRights |= CASTLE_WHITE_KING;
-	}
-	if ( fen.GetCastleRights().contains( 'Q' ) ) {
-		m_CastleRights |= CASTLE_WHITE_QUEEN;
+	for ( const char character : fen.GetCastleRights() ) {
+		if ( character == '-' )
+			break;
+
+		const auto side = std::isupper( character ) ? WHITE : BLACK;
+		const auto kingSquare = GetKingSquare( side );
+		const uint8_t file = std::toupper( character ) - 'A';
+		const auto index = 2 * side + (file < kingSquare.GetFile() ? 0 : 1);
+		m_CastleRights |= 0b1000 >> index;
+		m_Rooks[index] = Square( kingSquare.GetRank(), file );
 	}
 
 	m_enPassantSquare = NULL_SQUARE;
@@ -116,16 +129,16 @@ std::string Board::ToString() const {
 	std::string castleRights = "";
 
 	if ( CanCastle( CASTLE_WHITE_KING ) ) {
-		castleRights += "K";
+		castleRights += 'A' + m_Rooks[1].GetFile();
 	}
 	if ( CanCastle( CASTLE_WHITE_QUEEN ) ) {
-		castleRights += "Q";
+		castleRights += 'A' + m_Rooks[0].GetFile();
 	}
 	if ( CanCastle( CASTLE_BLACK_KING ) ) {
-		castleRights += "k";
+		castleRights += 'a' + m_Rooks[3].GetFile();
 	}
 	if ( CanCastle( CASTLE_BLACK_QUEEN ) ) {
-		castleRights += "q";
+		castleRights += 'a' + m_Rooks[2].GetFile();
 	}
 	if ( castleRights == "" ) {
 		castleRights = "-";
@@ -137,14 +150,14 @@ std::string Board::ToString() const {
 	}
 
 	std::string info[8]{
-		std::format( "FEN: TBD" ),
+		std::format( "FEN: {}", ToFEN() ),
+		std::format( "Chess960: {}", GetChess960() ),
 		std::format( "Zobrist Hash: {:#x}", GetHash() ),
 		std::format( "Castle Rights: {}", castleRights ),
 		std::format( "Side To Move: {}", stm ),
 		std::format( "En Passant: {}", GetEnPassantSquare().ToString() ),
 		std::format( "Half Moves: {}", m_HalfMoves ),
 		std::format( "Phase: {}", static_cast<int>(m_Phase) ),
-		std::format( "Insufficient Material: {}", IsInsufficientMaterial() ),
 	};
 
 	result += " -----------------\n";
@@ -174,63 +187,6 @@ std::string Board::ToString() const {
 	return result;
 }
 
-void Board::MakeMove( const Move &move ) {
-	const Square fromSquare = move.GetFromSquare();
-	const Square toSquare = move.GetToSquare();
-	const MoveFlag moveFlag = move.GetFlag();
-	const bool isPromotion = move.IsPromotion();
-	const bool isCapture = move.IsCapture();
-	const SideToMove oppositeSideToMove = ~m_Side;
-	const PieceType movedPiece = GetPieceOnSquare( fromSquare );
-	const PieceType capturedPiece = GetPieceOnSquare( toSquare );
-
-	if ( capturedPiece != NULL_PIECE ) {
-		RemovePieceOnSquare( toSquare, capturedPiece, oppositeSideToMove );
-	}
-
-	RemovePieceOnSquare( fromSquare, movedPiece, m_Side );
-	if ( !isPromotion ) {
-		SetPieceOnSquare( toSquare, movedPiece, m_Side );
-	}
-
-	if ( movedPiece == PAWN || isCapture ) {
-		m_HalfMoves = 0;
-	} else {
-		m_HalfMoves++;
-	}
-
-	m_CastleRights &= ~( CASTLE_MASK[fromSquare] | CASTLE_MASK[toSquare] );
-	m_enPassantSquare = NULL_SQUARE;
-
-	const uint8_t sideFlip = 56 * m_Side;
-	switch ( moveFlag ) {
-		case DOUBLE_PUSH_FLAG:
-			m_enPassantSquare = toSquare ^ 8;
-			break;
-		case QUEEN_SIDE_CASTLE_FLAG:
-			RemovePieceOnSquare( sideFlip, ROOK, m_Side );
-			SetPieceOnSquare( sideFlip + 3, ROOK, m_Side );
-			break;
-		case KING_SIDE_CASTLE_FLAG:
-			RemovePieceOnSquare( sideFlip + 7, ROOK, m_Side );
-			SetPieceOnSquare( sideFlip + 5, ROOK, m_Side );
-			break;
-		case EN_PASSANT_FLAG:
-			RemovePieceOnSquare( toSquare ^ 8, PAWN, oppositeSideToMove );
-			break;
-		case KNIGHT_PROMOTION_FLAG:
-		case BISHOP_PROMOTION_FLAG:
-		case ROOK_PROMOTION_FLAG:
-		case QUEEN_PROMOTION_FLAG:
-		case KNIGHT_PROMOTION_CAPTURE_FLAG:
-		case BISHOP_PROMOTION_CAPTURE_FLAG:
-		case ROOK_PROMOTION_CAPTURE_FLAG:
-		case QUEEN_PROMOTION_CAPTURE_FLAG:
-			SetPieceOnSquare( toSquare, move.GetPromotionPieceType(), m_Side );
-			break;
-		default:
-			break;
-	}
-
-	m_Side = ~m_Side;
+std::string Board::ToFEN() const {
+	return "";
 }

@@ -11,6 +11,7 @@ struct FEN {
 		std::string m_EnPassantSquare;
 		std::string m_HalfMoveCounter;
 		std::string m_FullMoveCounter;
+		bool m_Chess960;
 
 	public:
 		FEN( const std::string &str = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" );
@@ -49,6 +50,11 @@ struct FEN {
 		}
 
 		[[nodiscard]]
+		bool IsChess960() const {
+			return m_Chess960;
+		}
+
+		[[nodiscard]]
 		std::string ToString() const;
 
 		FEN operator=( const std::string &value ) const {
@@ -58,4 +64,6 @@ struct FEN {
 	private:
 		[[nodiscard]]
 		static std::vector<std::string> Split( const std::string &str, char delimiter );
+		[[nodiscard]]
+		std::string NormalizeCastleRights( const std::string &rights );
 };

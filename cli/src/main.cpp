@@ -1,4 +1,5 @@
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <thread>
 
@@ -22,25 +23,30 @@ int main() {
 	infos[16] = "   draw";
 	std::cout << "\n" << GetASCIILogo( infos ) << std::endl << std::endl;
 
-	auto board = Board( FEN() );
+	const auto fen = FEN();
+	std::cout << fen.ToString() << std::endl;
+
+	auto board = Board( fen );
+	const auto castleMask = board.GenerateCastleMask();
+
 	std::cout << board.ToString() << std::endl;
 
-	auto thread = std::jthread( [&board]( std::stop_token token ) {
+	auto thread = std::jthread( [&board, &castleMask]( std::stop_token token ) {
 		auto t = std::chrono::high_resolution_clock::now();
-		uint64_t result = Perft( board, 6, false, true, true );
+		uint64_t result = Perft( board, castleMask, 6, false, true, true );
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::high_resolution_clock::now() - t );
 		std::cout << "Result: " << result << std::endl;
 		std::cout << "Time: " << duration << std::endl;
-		std::cout << "Speed: " << ( result * 1000 / duration.count() ) << "nps" << std::endl << std::endl << std::endl;
+		std::cout << "Speed: " << ( result * 1000 / ( duration.count() + 1 ) ) << "nps" << std::endl << std::endl << std::endl;
 
 		t = std::chrono::high_resolution_clock::now();
-		result = Perft( board, 7, true, true, true );
+		result = Perft( board, castleMask, 7, true, true, true );
 		duration = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::high_resolution_clock::now() - t );
 		std::cout << "Result: " << result << std::endl;
 		std::cout << "Time: " << duration << std::endl;
-		std::cout << "Speed: " << ( result * 1000 / duration.count() ) << "nps" << std::endl << std::endl << std::endl;
+		std::cout << "Speed: " << ( result * 1000 / ( duration.count() + 1 ) ) << "nps" << std::endl << std::endl << std::endl;
 	} );
 
 	thread.join();

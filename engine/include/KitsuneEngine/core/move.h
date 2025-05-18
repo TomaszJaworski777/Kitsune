@@ -51,12 +51,18 @@ struct Move {
 		}
 
 		[[nodiscard]]
+		constexpr bool IsCastle() const {
+			const auto flag = GetFlag();
+			return flag == KING_SIDE_CASTLE_FLAG || flag == QUEEN_SIDE_CASTLE_FLAG;
+		}
+
+		[[nodiscard]]
 		constexpr PieceType GetPromotionPieceType() const {
 			return static_cast<PieceType>(( GetFlag() >> 6 & 3 ) + 1);
 		}
 
 		[[nodiscard]]
-		std::string ToString() const;
+		std::string ToString( bool chess960 ) const;
 
 		constexpr operator uint16_t() const {
 			return m_Value;
