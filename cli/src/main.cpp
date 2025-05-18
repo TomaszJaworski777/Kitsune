@@ -23,7 +23,7 @@ int main() {
 	infos[16] = "   draw";
 	std::cout << "\n" << GetASCIILogo( infos ) << std::endl << std::endl;
 
-	const auto fen = FEN( "Qr1k1rbb/2p2ppp/1n1pq3/1p2p3/1P1P4/8/P1P1PPPP/NRN1KRBB b fb - 0 10" );
+	const auto fen = FEN();
 	std::cout << fen.ToString() << std::endl;
 
 	auto board = Board( fen );
@@ -33,7 +33,7 @@ int main() {
 
 	auto thread = std::jthread( [&board, &castleMask]( std::stop_token token ) {
 		auto t = std::chrono::high_resolution_clock::now();
-		uint64_t result = Perft( board, castleMask, 1, false, true, true );
+		uint64_t result = Perft( board, castleMask, 6, false, true, true );
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
 			std::chrono::high_resolution_clock::now() - t );
 		std::cout << "Result: " << result << std::endl;
